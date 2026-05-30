@@ -12,15 +12,18 @@
 [node name="Combat" type="Node2D" unique_id=1945016565]
 
 [node name="Fundo" type="Sprite2D" parent="." unique_id=1276450142]
+visible = false
 position = Vector2(640, 360)
 texture = ExtResource("1_bg")
 
 [node name="HeroiSprite" type="Sprite2D" parent="." unique_id=98513968]
+visible = false
 position = Vector2(320, 420)
 scale = Vector2(2, 2)
 texture = ExtResource("2_hero")
 
 [node name="InimigoSprite" type="Sprite2D" parent="." unique_id=425588243]
+visible = false
 position = Vector2(960, 420)
 scale = Vector2(2, 2)
 texture = ExtResource("3_enemy")
@@ -57,10 +60,10 @@ grow_vertical = 2
 
 [node name="PainelJogador" type="VBoxContainer" parent="HUD_Root/HUD" unique_id=1990098040]
 layout_mode = 1
-offset_left = 60.0
-offset_top = 520.0
-offset_right = 360.0
-offset_bottom = 660.0
+offset_left = 7.0
+offset_top = 480.0
+offset_right = 307.0
+offset_bottom = 641.0
 theme_override_constants/separation = 6
 
 [node name="NomeJogador" type="Label" parent="HUD_Root/HUD/PainelJogador" unique_id=2017425320]
@@ -103,10 +106,10 @@ text = "Fervor: 0"
 
 [node name="PainelInimigo" type="VBoxContainer" parent="HUD_Root/HUD" unique_id=1467193552]
 layout_mode = 1
-offset_left = 860.0
-offset_top = 180.0
-offset_right = 1160.0
-offset_bottom = 320.0
+offset_left = 848.0
+offset_top = 5.0
+offset_right = 1148.0
+offset_bottom = 147.0
 theme_override_constants/separation = 6
 
 [node name="NomeInimigo" type="Label" parent="HUD_Root/HUD/PainelInimigo" unique_id=1254298842]
@@ -149,10 +152,10 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 341.0
-offset_top = 221.0
-offset_right = 561.0
-offset_bottom = 281.0
+offset_left = 461.0
+offset_top = 270.0
+offset_right = 681.0
+offset_bottom = 330.0
 grow_horizontal = 0
 grow_vertical = 0
 theme_override_font_sizes/font_size = 24

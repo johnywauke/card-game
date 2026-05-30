@@ -23,12 +23,24 @@ var _indice_seq: int = 0
 
 
 func _ready() -> void:
+	eh_jogador = false
 	# Configura a partir do EnemyData antes de inicializar a vida.
 	if dados != null:
 		hp_max = dados.hp_max
 		nome_exibicao = dados.nome
-	eh_jogador = false
 	super._ready() # define hp_atual = hp_max
+
+
+## (Re)configura o inimigo a partir de um EnemyData. Útil quando o setup
+## define os dados depois do _ready (ex: CombatSetup). Reseta o HP cheio.
+func aplicar_dados(novos_dados: EnemyData) -> void:
+	dados = novos_dados
+	if dados == null:
+		return
+	hp_max = dados.hp_max
+	nome_exibicao = dados.nome
+	hp_atual = hp_max
+	_indice_seq = 0
 
 
 ## Escolhe o próximo move conforme o padrão de IA e avisa a UI.
