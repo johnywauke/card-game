@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CardData" load_steps=2 format=3 uid="uid://swquebrag01"]
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://swquebrag01"]
 
 [ext_resource type="Script" uid="uid://bdxlpgi6w130y" path="res://Script/Resources/CardData.gd" id="1_script"]
 
