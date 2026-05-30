@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=2 format=3 uid="uid://swrodopio01"]
+
+[ext_resource type="Script" uid="uid://bdxlpgi6w130y" path="res://Script/Resources/CardData.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"rodopio"
+nome = "Rodopio"
+descricao = "Causa 9 de dano a todos os inimigos."
+tipo = 0
+raridade = 1
+alvo = 1
+custo = 2
+valor_base = 9
+fervor_ganho = 0
+fervor_custo = 0
+efeitos = []

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=2 format=3 uid="uid://swgrito0001"]
+
+[ext_resource type="Script" uid="uid://bdxlpgi6w130y" path="res://Script/Resources/CardData.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"grito_guerra"
+nome = "Grito de Guerra"
+descricao = "Ganha 2 de Força."
+tipo = 2
+raridade = 1
+alvo = 2
+custo = 1
+valor_base = 0
+fervor_ganho = 0
+fervor_custo = 0
+efeitos = [{ "tipo": "aplicar_status", "status": "forca", "valor": 2, "alvo": "usuario" }]

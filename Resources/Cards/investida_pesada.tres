@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=2 format=3 uid="uid://swinvestida1"]
+
+[ext_resource type="Script" uid="uid://bdxlpgi6w130y" path="res://Script/Resources/CardData.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"investida"
+nome = "Investida Pesada"
+descricao = "Causa 14 de dano."
+tipo = 0
+raridade = 0
+alvo = 0
+custo = 2
+valor_base = 14
+fervor_ganho = 0
+fervor_custo = 0
+efeitos = []

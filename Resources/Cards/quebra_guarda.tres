@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=2 format=3 uid="uid://swquebrag01"]
+
+[ext_resource type="Script" uid="uid://bdxlpgi6w130y" path="res://Script/Resources/CardData.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"quebra_guarda"
+nome = "Quebra-Guarda"
+descricao = "Causa 7 de dano. Aplica 2 de Vulnerável."
+tipo = 0
+raridade = 1
+alvo = 0
+custo = 1
+valor_base = 7
+fervor_ganho = 0
+fervor_custo = 0
+efeitos = [{ "tipo": "aplicar_status", "status": "vulneravel", "valor": 2, "alvo": "inimigo" }]

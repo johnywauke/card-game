@@ -73,6 +73,19 @@ static func _aplicar_efeito_extra(efeito: Dictionary, usuario: Combatant, alvo: 
 		"bloqueio":
 			usuario.ganhar_bloqueio(efeito.get("valor", 0))
 
+		"dano":
+			# Golpe de dano adicional (permite cartas de golpe múltiplo).
+			# alvo: "inimigo" (o alvo mirado) ou "todos".
+			var d := usuario.calcular_dano_ataque(efeito.get("valor", 0))
+			var quem_str: String = efeito.get("alvo", "inimigo")
+			if quem_str == "todos":
+				for inimigo in todos_inimigos:
+					if inimigo != null and inimigo.esta_vivo():
+						inimigo.receber_dano(d)
+			else:
+				if alvo != null and alvo.esta_vivo():
+					alvo.receber_dano(d)
+
 		"dano_por_fervor":
 			# Gasta todo o Fervor e causa dano proporcional a TODOS os inimigos.
 			var mult: int = efeito.get("multiplicador", 1)
