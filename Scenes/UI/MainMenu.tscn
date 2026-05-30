@@ -13,6 +13,7 @@ grow_vertical = 2
 script = ExtResource("1_script")
 
 [node name="Fundo" type="TextureRect" parent="." unique_id=408055726]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
