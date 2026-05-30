@@ -8,8 +8,8 @@ extends Control
 const CAMINHO_SAVE: String = "user://savegame.json"
 
 ## Cena do jogo a carregar ao clicar em Jogar.
-## Ajuste para a sua cena de combate ou mapa quando ela estiver pronta.
-const CENA_JOGO: String = "res://node_2d.tscn"
+## Aponta para a cena de combate. Troque para a cena de mapa quando ela estiver pronta.
+const CENA_JOGO: String = "res://Scenes/Combat/Combat.tscn"
 
 @onready var botao_jogar: Button = $VBoxContainer/BotaoJogar
 @onready var botao_opcoes: Button = $VBoxContainer/BotaoOpcoes

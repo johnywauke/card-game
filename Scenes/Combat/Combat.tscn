@@ -27,7 +27,6 @@ texture = ExtResource("3_enemy")
 
 [node name="Jogador" type="Node" parent="." unique_id=774754741]
 script = ExtResource("4_player")
-hp_max = 70
 nome_exibicao = "Devota da Aurora"
 eh_jogador = true
 
@@ -38,7 +37,6 @@ nome_exibicao = "Geleko"
 
 [node name="CombatStateMachine" type="Node" parent="." unique_id=1107687334]
 script = ExtResource("6_csm")
-energia_maxima = 3
 
 [node name="HUD_Root" type="Control" parent="." unique_id=672272866]
 layout_mode = 3
