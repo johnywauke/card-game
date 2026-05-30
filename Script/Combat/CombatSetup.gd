@@ -1,29 +1,20 @@
 ## CombatSetup.gd
 ## Monta o combate quando a cena Combat abre:
-##  - cria o baralho inicial no DeckManager
+##  - garante que há uma run em andamento (baralho + HP persistem entre combates)
 ##  - configura o jogador (Combatant) e o inimigo (Enemy)
-##  - conecta a HUD e a mão de cartas (Hand)
+##  - conecta a HUD, a mão de cartas (Hand) e a tela de fim de combate
 ##  - inicia a CombatStateMachine
 ##
-## Os campos abaixo podem ser preenchidos no Inspector. Se ficarem VAZIOS,
-## o setup carrega um baralho e um inimigo padrão automaticamente.
+## O baralho da run vive no DeckManager (cresce com as recompensas). O inimigo
+## pode ser definido no Inspector; se vazio, usa o Geleko padrão.
 extends Node
-
-## Cartas do baralho inicial (opcional: arraste .tres no Inspector).
-@export var baralho_inicial: Array[CardData] = []
 
 ## Dados do inimigo (opcional: arraste um EnemyData no Inspector).
 @export var dados_inimigo: EnemyData
 
-# Baralho inicial padrão do Espadachin (estilo Slay the Spire):
-# 5 Corte, 4 Defender, 1 Quebra-Guarda.
-const DECK_PADRAO := {
-	"res://Resources/Cards/corte.tres": 5,
-	"res://Resources/Cards/defender.tres": 4,
-	"res://Resources/Cards/quebra_guarda.tres": 1,
-}
 const INIMIGO_PADRAO := "res://Resources/Enemies/geleko.tres"
 const HAND_SCRIPT := "res://Script/Combat/Hand.gd"
+const FIM_SCRIPT := "res://Script/Combat/CombatEndScreen.gd"
 
 @onready var jogador: Combatant = $"../Jogador"
 @onready var inimigo: Enemy = $"../Inimigo"
@@ -32,25 +23,30 @@ const HAND_SCRIPT := "res://Script/Combat/Hand.gd"
 
 
 func _ready() -> void:
-	# 1) Baralho: usa o do Inspector ou monta o padrão do Espadachin.
-	if baralho_inicial.is_empty():
-		baralho_inicial = _construir_baralho_padrao()
-	DeckManager.definir_baralho(baralho_inicial)
+	# 1) Garante uma run ativa (na primeira vez, monta o baralho do Espadachin).
+	if not DeckManager.run_iniciada:
+		DeckManager.iniciar_run()
 
-	# 2) Inimigo: usa o do Inspector ou carrega o Geleko padrão.
+	# 2) Aplica o HP do jogador salvo na run.
+	if jogador != null:
+		jogador.hp_max = DeckManager.hp_max_jogador
+		jogador.hp_atual = DeckManager.hp_jogador
+
+	# 3) Inimigo: usa o do Inspector ou carrega o Geleko padrão.
 	if dados_inimigo == null:
 		dados_inimigo = load(INIMIGO_PADRAO) as EnemyData
 	if inimigo != null and dados_inimigo != null:
 		inimigo.aplicar_dados(dados_inimigo)
 
-	# 3) Conecta a HUD.
+	# 4) Conecta a HUD (lê o HP já ajustado).
 	if hud != null and hud.has_method("configurar"):
 		hud.configurar(jogador, inimigo, maquina)
 
-	# 4) Cria a mão de cartas clicáveis e a adiciona à UI.
+	# 5) Cria a mão de cartas clicáveis e a tela de fim de combate.
 	_criar_mao()
+	_criar_tela_fim()
 
-	# 5) Inicia o combate (isto compra a primeira mão e dispara a UI).
+	# 6) Inicia o combate (compra a primeira mão e dispara a UI).
 	var lista_inimigos: Array[Combatant] = [inimigo]
 	maquina.iniciar_combate(jogador, lista_inimigos)
 
@@ -62,19 +58,18 @@ func _criar_mao() -> void:
 	var mao := Control.new()
 	mao.name = "Mao"
 	mao.set_script(load(HAND_SCRIPT))
-	hud.add_child(mao)        # dispara o _ready do Hand (conecta aos sinais).
+	hud.add_child(mao)
 	if mao.has_method("configurar"):
 		mao.configurar(maquina, inimigo)
 
 
-## Monta o baralho inicial padrão a partir do dicionário DECK_PADRAO.
-func _construir_baralho_padrao() -> Array[CardData]:
-	var cartas: Array[CardData] = []
-	for caminho in DECK_PADRAO:
-		var carta := load(caminho) as CardData
-		if carta != null:
-			for i in DECK_PADRAO[caminho]:
-				cartas.append(carta)
-	if cartas.is_empty():
-		push_warning("CombatSetup: não foi possível carregar as cartas padrão.")
-	return cartas
+## Instancia a tela de fim de combate (escondida até o combate acabar).
+func _criar_tela_fim() -> void:
+	if hud == null:
+		return
+	var fim := Control.new()
+	fim.name = "TelaFim"
+	fim.set_script(load(FIM_SCRIPT))
+	hud.add_child(fim)
+	if fim.has_method("configurar"):
+		fim.configurar(jogador)

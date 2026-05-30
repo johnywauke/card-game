@@ -27,6 +27,32 @@ var descarte: Array[CardData] = []
 ## Tamanho padrão da mão por turno.
 var tamanho_mao: int = 5
 
+## --- Estado da RUN (persiste entre combates) ---
+## Marca se uma run está em andamento. CombatSetup usa isto para decidir se
+## monta um baralho novo ou reaproveita o da run em curso.
+var run_iniciada: bool = false
+## HP do jogador carregado entre combates.
+var hp_jogador: int = 70
+var hp_max_jogador: int = 70
+
+# Baralho inicial padrão do Espadachin (caminho -> quantidade).
+const _DECK_INICIAL := {
+	"res://Resources/Cards/corte.tres": 5,
+	"res://Resources/Cards/defender.tres": 4,
+	"res://Resources/Cards/quebra_guarda.tres": 1,
+}
+
+# Cartas que podem aparecer como recompensa pós-combate.
+const _POOL_RECOMPENSA := [
+	"res://Resources/Cards/investida_pesada.tres",
+	"res://Resources/Cards/talho_duplo.tres",
+	"res://Resources/Cards/postura_de_ferro.tres",
+	"res://Resources/Cards/grito_de_guerra.tres",
+	"res://Resources/Cards/segundo_folego.tres",
+	"res://Resources/Cards/rodopio.tres",
+	"res://Resources/Cards/decapitar.tres",
+]
+
 
 ## Define o baralho da run (chamado ao iniciar uma partida).
 ## Faz cópias independentes de cada carta para evitar efeitos colaterais.
@@ -39,6 +65,37 @@ func definir_baralho(cartas: Array[CardData]) -> void:
 ## Adiciona uma carta nova ao baralho mestre (recompensa pós-combate / loja).
 func adicionar_carta(carta: CardData) -> void:
 	baralho_mestre.append(carta.duplicar())
+
+
+## Inicia uma nova run: monta o baralho inicial do Espadachin e reseta o HP.
+func iniciar_run() -> void:
+	var inicial: Array[CardData] = []
+	for caminho in _DECK_INICIAL:
+		var carta := load(caminho) as CardData
+		if carta != null:
+			for i in _DECK_INICIAL[caminho]:
+				inicial.append(carta)
+	definir_baralho(inicial)
+	hp_max_jogador = 70
+	hp_jogador = 70
+	run_iniciada = true
+
+
+## Encerra a run atual (chamado no game over).
+func encerrar_run() -> void:
+	run_iniciada = false
+
+
+## Sorteia até n cartas distintas do pool de recompensas.
+func sortear_recompensas(n: int = 3) -> Array[CardData]:
+	var pool := _POOL_RECOMPENSA.duplicate()
+	pool.shuffle()
+	var resultado: Array[CardData] = []
+	for i in min(n, pool.size()):
+		var carta := load(pool[i]) as CardData
+		if carta != null:
+			resultado.append(carta)
+	return resultado
 
 
 ## Prepara as pilhas para um novo combate.

@@ -141,11 +141,16 @@ func _ao_inimigo_morrer(_inimigo) -> void:
 
 
 func _ao_jogador_morrer() -> void:
+	if estado == Estado.DERROTA or estado == Estado.VITORIA:
+		return
 	estado = Estado.DERROTA
 	SignalBus.combate_perdido.emit()
 
 
 func _checar_vitoria() -> void:
+	# Evita sinalizar vitória mais de uma vez (ou após derrota).
+	if estado == Estado.VITORIA or estado == Estado.DERROTA:
+		return
 	for inimigo in inimigos:
 		if inimigo.esta_vivo():
 			return # Ainda há inimigos vivos.

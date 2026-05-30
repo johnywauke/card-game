@@ -27,7 +27,8 @@ func _ready() -> void:
 ## --- Sinais dos botões (conecte cada pressed() a estas funções no editor) ---
 
 func _on_botao_jogar_pressed() -> void:
-	# Aqui você pode carregar o save antes de trocar de cena, se quiser.
+	# Inicia uma run nova (reseta o baralho do Espadachin e o HP).
+	DeckManager.iniciar_run()
 	get_tree().change_scene_to_file(CENA_JOGO)
 
 
