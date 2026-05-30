@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3 uid="uid://enemygeleko01"]
+
+[ext_resource type="Script" path="res://Script/Resources/EnemyData.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"geleko"
+nome = "Geleko"
+hp_max = 12
+padrao = 0
+intencoes = [{
+"tipo": "atacar",
+"valor": 4
+}, {
+"tipo": "atacar",
+"valor": 6
+}, {
+"tipo": "defender",
+"valor": 4
+}]
