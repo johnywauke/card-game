@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="card"
-run/main_scene="uid://dl13ff63r8gsb"
+run/main_scene="uid://bj0riotgv0y0m"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 config/icon="res://icon.svg"
 
