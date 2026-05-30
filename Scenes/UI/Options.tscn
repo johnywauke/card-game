@@ -1,0 +1,111 @@
+[gd_scene format=3 uid="uid://63657q2pe4b5"]
+
+[ext_resource type="Script" path="res://Script/UI/Options.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://ccxe6ppn6s6u3" path="res://Assets/Map/slay2.webp" id="2_bg"]
+
+[node name="Options" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Fundo" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_bg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Escurecedor" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.55)
+
+[node name="Painel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -280.0
+offset_top = -240.0
+offset_right = 280.0
+offset_bottom = 240.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="Painel"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Titulo" type="Label" parent="Painel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Opções"
+horizontal_alignment = 1
+
+[node name="LinhaMusica" type="HBoxContainer" parent="Painel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="LabelMusica" type="Label" parent="Painel/VBox/LinhaMusica"]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Música"
+vertical_alignment = 1
+
+[node name="SliderMusica" type="HSlider" parent="Painel/VBox/LinhaMusica"]
+custom_minimum_size = Vector2(280, 0)
+layout_mode = 2
+size_flags_vertical = 4
+max_value = 1.0
+step = 0.01
+value = 0.8
+
+[node name="LinhaEfeitos" type="HBoxContainer" parent="Painel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="LabelEfeitos" type="Label" parent="Painel/VBox/LinhaEfeitos"]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Efeitos"
+vertical_alignment = 1
+
+[node name="SliderEfeitos" type="HSlider" parent="Painel/VBox/LinhaEfeitos"]
+custom_minimum_size = Vector2(280, 0)
+layout_mode = 2
+size_flags_vertical = 4
+max_value = 1.0
+step = 0.01
+value = 0.8
+
+[node name="CheckTelaCheia" type="CheckButton" parent="Painel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Tela cheia"
+
+[node name="BotaoVoltar" type="Button" parent="Painel/VBox"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Voltar"
+
+[connection signal="value_changed" from="Painel/VBox/LinhaMusica/SliderMusica" to="." method="_on_slider_musica_value_changed"]
+[connection signal="value_changed" from="Painel/VBox/LinhaEfeitos/SliderEfeitos" to="." method="_on_slider_efeitos_value_changed"]
+[connection signal="toggled" from="Painel/VBox/CheckTelaCheia" to="." method="_on_check_tela_cheia_toggled"]
+[connection signal="pressed" from="Painel/VBox/BotaoVoltar" to="." method="_on_botao_voltar_pressed"]
