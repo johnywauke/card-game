@@ -1,0 +1,113 @@
+[gd_scene format=3 uid="uid://jgs2pmhxc3wt"]
+
+[ext_resource type="Texture2D" uid="uid://cpfltt44brng6" path="res://Assets/Map/mapa.png" id="1_ta5nu"]
+[ext_resource type="Texture2D" uid="uid://ccxe6ppn6s6u3" path="res://Assets/Map/slay2.webp" id="1_x0ka3"]
+[ext_resource type="Texture2D" uid="uid://byjott55w37h1" path="res://Assets/Map/IMG_2242.png" id="2_0h7mo"]
+[ext_resource type="Texture2D" uid="uid://j0bqq468j66w" path="res://Assets/Item/barravazia.png" id="3_nr8wp"]
+[ext_resource type="Texture2D" uid="uid://c043kxnsnnhtq" path="res://Assets/Sprites/Hero/2.png" id="4_d2bti"]
+[ext_resource type="Texture2D" uid="uid://by6tk8dg2g7eo" path="res://Assets/Sprites/Enemies/01/3.png" id="5_ta5nu"]
+[ext_resource type="Texture2D" uid="uid://bif4gg10qtmxe" path="res://Assets/Cards/Buff/agi1.png" id="6_flf07"]
+[ext_resource type="Texture2D" uid="uid://c12hmyrmlm0j7" path="res://Assets/Sprites/Enemies/01/2.png" id="6_k73cj"]
+[ext_resource type="Texture2D" uid="uid://bh4dmnywh7sli" path="res://Assets/Cards/Buff/archer atk.png" id="7_k73cj"]
+[ext_resource type="Texture2D" uid="uid://cq6nbtddbskml" path="res://Assets/Cards/Buff/atkpet.png" id="8_rjqkl"]
+[ext_resource type="Texture2D" uid="uid://c8svdonewuruh" path="res://Assets/Item/coraçao1.png" id="9_fs4d3"]
+[ext_resource type="Texture2D" uid="uid://ihj8uq3wmurl" path="res://Assets/Item/pao.png" id="10_7vxoj"]
+[ext_resource type="Texture2D" uid="uid://djf528idujno5" path="res://Assets/Item/pot2.png" id="11_ei405"]
+[ext_resource type="Texture2D" uid="uid://bnm7d5v1hss7n" path="res://Assets/Item/pot.png" id="12_e8dv2"]
+[ext_resource type="Texture2D" uid="uid://dop4qe1trwgam" path="res://Assets/Item/saco.png" id="15_rjqkl"]
+[ext_resource type="Texture2D" uid="uid://pjdw33apfwc2" path="res://Assets/Item/anel.png" id="16_fs4d3"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_7vxoj"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_k73cj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_ta5nu")
+}],
+"loop": false,
+"name": &"default",
+"speed": 5.0
+}]
+
+[node name="Node2D" type="Node2D" unique_id=904319615]
+
+[node name="Mapa" type="Sprite2D" parent="." unique_id=1122233316]
+position = Vector2(576.31915, 329.5)
+scale = Vector2(0.7010639, 0.7010638)
+texture = ExtResource("1_ta5nu")
+
+[node name="Slay2" type="Sprite2D" parent="." unique_id=1698109866]
+position = Vector2(-774, 356.00003)
+scale = Vector2(1.1215278, 1.1215278)
+texture = ExtResource("1_x0ka3")
+
+[node name="Img2242" type="Sprite2D" parent="." unique_id=1987459368]
+visible = false
+position = Vector2(578.4049, 326.5)
+scale = Vector2(0.86835104, 0.868351)
+texture = ExtResource("2_0h7mo")
+
+[node name="Barravazia" type="Sprite2D" parent="." unique_id=1469476615]
+position = Vector2(142.11487, 109.125)
+scale = Vector2(0.25638297, 0.25638297)
+texture = ExtResource("3_nr8wp")
+
+[node name="2" type="Sprite2D" parent="." unique_id=758134739]
+position = Vector2(215, 435)
+scale = Vector2(0.49250448, 0.49250463)
+texture = ExtResource("4_d2bti")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=173084428]
+position = Vector2(898, 376)
+scale = Vector2(0.5975193, 0.59751934)
+sprite_frames = SubResource("SpriteFrames_7vxoj")
+frame = 1
+frame_progress = 1.0
+flip_h = true
+
+[node name="Agi1" type="Sprite2D" parent="." unique_id=1418718982]
+position = Vector2(575, 325.53333)
+scale = Vector2(1.0666667, 1.0666667)
+texture = ExtResource("6_flf07")
+
+[node name="ArcherAtk" type="Sprite2D" parent="." unique_id=1656418119]
+position = Vector2(805.00006, 631.99994)
+scale = Vector2(0.76111114, 0.76111114)
+texture = ExtResource("7_k73cj")
+
+[node name="Atkpet" type="Sprite2D" parent="." unique_id=1210597538]
+position = Vector2(571, 602.7191)
+scale = Vector2(0.7977528, 0.7977528)
+texture = ExtResource("8_rjqkl")
+
+[node name="Coraçao1" type="Sprite2D" parent="." unique_id=1915715901]
+position = Vector2(88.11487, 108.12499)
+scale = Vector2(0.05552392, 0.05552392)
+texture = ExtResource("9_fs4d3")
+
+[node name="Pao" type="Sprite2D" parent="." unique_id=2113073028]
+position = Vector2(48.11487, 109.12499)
+scale = Vector2(0.043749996, 0.04375)
+texture = ExtResource("10_7vxoj")
+
+[node name="Pot2" type="Sprite2D" parent="." unique_id=496589306]
+position = Vector2(163.11487, 107.12499)
+scale = Vector2(0.033881545, 0.033881538)
+texture = ExtResource("11_ei405")
+
+[node name="Pot" type="Sprite2D" parent="." unique_id=6775417]
+position = Vector2(127.11487, 107.12499)
+scale = Vector2(0.032024324, 0.03202432)
+texture = ExtResource("12_e8dv2")
+
+[node name="Saco" type="Sprite2D" parent="." unique_id=1061154599]
+position = Vector2(200.11487, 107.125)
+scale = Vector2(0.31716415, 0.31716412)
+texture = ExtResource("15_rjqkl")
+
+[node name="Anel" type="Sprite2D" parent="." unique_id=407625043]
+position = Vector2(239.11493, 106.124985)
+scale = Vector2(0.34375, 0.34375)
+texture = ExtResource("16_fs4d3")
