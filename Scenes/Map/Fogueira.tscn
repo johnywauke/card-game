@@ -1,4 +1,4 @@
-[gd_scene load_steps=3 format=3 uid="uid://fogueira00001"]
+[gd_scene format=3 uid="uid://bs1ysgt1gs5aa"]
 
 [ext_resource type="Script" path="res://Script/Map/Fogueira.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://ccxe6ppn6s6u3" path="res://Assets/Map/slay2.webp" id="2_bg"]
