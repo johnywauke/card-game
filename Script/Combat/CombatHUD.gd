@@ -114,6 +114,12 @@ func _texto_intencao(intencao: Dictionary) -> String:
 			return "🗡 %dx%d" % [intencao.get("valor", 0), intencao.get("vezes", 1)]
 		"defender":
 			return "🛡 %d" % intencao.get("valor", 0)
+		"atacar_defender":
+			return "🗡 %d / 🛡 %d" % [intencao.get("valor", 0), intencao.get("bloqueio", 0)]
+		"atacar_status":
+			return "🗡 %d ☠" % intencao.get("valor", 0)
+		"defender_buff":
+			return "🛡 %d ✨" % intencao.get("bloqueio", 0)
 		"buff":
 			return "✨ Fortalecendo"
 		"debuff":

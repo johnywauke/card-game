@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3 uid="uid://chefebronze01"]
+
+[ext_resource type="Script" path="res://Script/Resources/EnemyData.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"guardiao_bronze"
+nome = "Guardião de Bronze"
+hp_max = 100
+padrao = 0
+intencoes = [{ "tipo": "atacar", "valor": 12 }, { "tipo": "defender_buff", "bloqueio": 10, "status": "forca", "valor": 3 }, { "tipo": "atacar_status", "valor": 10, "status": "fraqueza", "status_valor": 2 }, { "tipo": "atacar_multiplo", "valor": 7, "vezes": 3 }]

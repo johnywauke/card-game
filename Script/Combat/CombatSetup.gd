@@ -6,10 +6,23 @@
 ##  - inicia a CombatStateMachine
 extends Node
 
-## Dados do inimigo (opcional: arraste um EnemyData no Inspector).
+## Dados do inimigo (opcional: arraste um EnemyData no Inspector para forçar um).
 @export var dados_inimigo: EnemyData
 
-const INIMIGO_PADRAO := "res://Resources/Enemies/geleko.tres"
+# Pools de inimigos por tipo de nó.
+const INIMIGOS_BASICOS := [
+	"res://Resources/Enemies/geleko.tres",
+	"res://Resources/Enemies/cogumin.tres",
+	"res://Resources/Enemies/vesporio.tres",
+	"res://Resources/Enemies/casco.tres",
+	"res://Resources/Enemies/espreitador.tres",
+]
+const INIMIGOS_ELITE := [
+	"res://Resources/Enemies/brutamonte.tres",
+	"res://Resources/Enemies/naja.tres",
+]
+const INIMIGO_CHEFE := "res://Resources/Enemies/guardiao_bronze.tres"
+
 const HAND_SCRIPT := "res://Script/Combat/Hand.gd"
 const FIM_SCRIPT := "res://Script/Combat/CombatEndScreen.gd"
 
@@ -29,21 +42,18 @@ func _ready() -> void:
 		jogador.hp_max = DeckManager.hp_max_jogador
 		jogador.hp_atual = DeckManager.hp_jogador
 
-	# 3) Inimigo: usa o do Inspector ou carrega o Geleko padrão.
+	# 3) Escolhe o inimigo conforme o tipo de nó do mapa.
 	if dados_inimigo == null:
-		dados_inimigo = load(INIMIGO_PADRAO) as EnemyData
+		dados_inimigo = _sortear_inimigo()
 	if inimigo != null and dados_inimigo != null:
 		inimigo.aplicar_dados(dados_inimigo)
-		# Elite e Chefe são mais fortes (mais HP).
-		match DeckManager.tipo_no_atual:
-			"elite":
-				inimigo.hp_max = int(dados_inimigo.hp_max * 2.5)
-				inimigo.hp_atual = inimigo.hp_max
-				inimigo.nome_exibicao = dados_inimigo.nome + " (Elite)"
-			"chefe":
-				inimigo.hp_max = int(dados_inimigo.hp_max * 5)
-				inimigo.hp_atual = inimigo.hp_max
-				inimigo.nome_exibicao = dados_inimigo.nome + " (Chefe)"
+		# Elite recebe um reforço extra de HP (além de já ser um inimigo forte).
+		if DeckManager.tipo_no_atual == "elite":
+			inimigo.hp_max = int(dados_inimigo.hp_max * 1.2)
+			inimigo.hp_atual = inimigo.hp_max
+			inimigo.nome_exibicao = dados_inimigo.nome + " (Elite)"
+		elif DeckManager.tipo_no_atual == "chefe":
+			inimigo.nome_exibicao = dados_inimigo.nome + " (Chefe)"
 
 	# 4) Conecta a HUD (lê o HP já ajustado).
 	if hud != null and hud.has_method("configurar"):
@@ -74,3 +84,16 @@ func _criar_tela_fim() -> void:
 	fim.name = "TelaFim"
 	hud.add_child(fim)
 	fim.configurar(jogador)
+
+
+## Sorteia o inimigo conforme o tipo de nó atual do mapa.
+func _sortear_inimigo() -> EnemyData:
+	var caminho := ""
+	match DeckManager.tipo_no_atual:
+		"elite":
+			caminho = INIMIGOS_ELITE.pick_random()
+		"chefe":
+			caminho = INIMIGO_CHEFE
+		_:
+			caminho = INIMIGOS_BASICOS.pick_random()
+	return load(caminho) as EnemyData

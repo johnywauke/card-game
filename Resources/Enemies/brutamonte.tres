@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3 uid="uid://elitebrutamon"]
+
+[ext_resource type="Script" path="res://Script/Resources/EnemyData.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"brutamonte"
+nome = "Brutamonte"
+hp_max = 40
+padrao = 0
+intencoes = [{ "tipo": "buff", "status": "forca", "valor": 2 }, { "tipo": "atacar", "valor": 10 }, { "tipo": "atacar_defender", "valor": 8, "bloqueio": 8 }]

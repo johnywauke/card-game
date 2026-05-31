@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3 uid="uid://enemyvesporio"]
+
+[ext_resource type="Script" path="res://Script/Resources/EnemyData.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"vesporio"
+nome = "Vespório"
+hp_max = 14
+padrao = 0
+intencoes = [{ "tipo": "atacar_multiplo", "valor": 3, "vezes": 2 }, { "tipo": "atacar", "valor": 7 }]

@@ -80,6 +80,23 @@ func executar_intencao(jogador: Combatant) -> void:
 		"defender":
 			ganhar_bloqueio(intencao_atual.get("valor", 0))
 
+		"atacar_defender":
+			# Ataca E ganha bloqueio no mesmo turno.
+			jogador.receber_dano(calcular_dano_ataque(intencao_atual.get("valor", 0)))
+			ganhar_bloqueio(intencao_atual.get("bloqueio", 0))
+
+		"atacar_status":
+			# Ataca e aplica um status no jogador (ex: veneno, vulneravel, fraqueza).
+			jogador.receber_dano(calcular_dano_ataque(intencao_atual.get("valor", 0)))
+			var st := StringName(intencao_atual.get("status", "veneno"))
+			jogador.aplicar_status(st, intencao_atual.get("status_valor", 1))
+
+		"defender_buff":
+			# Ganha bloqueio e se fortalece.
+			ganhar_bloqueio(intencao_atual.get("bloqueio", 0))
+			var bchave := StringName(intencao_atual.get("status", "forca"))
+			aplicar_status(bchave, intencao_atual.get("valor", 1))
+
 		"buff":
 			var chave := StringName(intencao_atual.get("status", "forca"))
 			aplicar_status(chave, intencao_atual.get("valor", 0))

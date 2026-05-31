@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3 uid="uid://enemycasco001"]
+
+[ext_resource type="Script" path="res://Script/Resources/EnemyData.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"casco"
+nome = "Casco-Duro"
+hp_max = 22
+padrao = 0
+intencoes = [{ "tipo": "defender", "valor": 8 }, { "tipo": "atacar", "valor": 6 }, { "tipo": "atacar_defender", "valor": 4, "bloqueio": 6 }]
