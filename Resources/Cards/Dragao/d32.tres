@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://drg00000032"]
+
+[ext_resource type="Script" uid="uid://bdxlpgi6w130y" path="res://Script/Resources/CardData.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"drg_servo"
+nome = "Servo Flamejante"
+descricao = "Invoca um servo: causa 6 de dano por 3 turnos."
+tipo = 3
+raridade = 1
+alvo = 3
+custo = 2
+valor_base = 0
+fervor_ganho = 0
+fervor_custo = 0
+efeitos = [{ "tipo": "invocar", "turnos": 3, "efeito": { "tipo": "dano", "valor": 6, "alvo": "inimigo" } }]

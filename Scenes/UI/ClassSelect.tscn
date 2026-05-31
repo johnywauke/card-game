@@ -1,9 +1,9 @@
-[gd_scene load_steps=3 format=3 uid="uid://classselect01"]
+[gd_scene format=3 uid="uid://cjk0qpcop5e4c"]
 
-[ext_resource type="Script" path="res://Script/UI/ClassSelect.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://dr8bv8jbpy4hd" path="res://Script/UI/ClassSelect.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://ccxe6ppn6s6u3" path="res://Assets/Map/slay2.webp" id="2_bg"]
 
-[node name="ClassSelect" type="Control"]
+[node name="ClassSelect" type="Control" unique_id=1841972143]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -12,7 +12,8 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_script")
 
-[node name="Fundo" type="TextureRect" parent="."]
+[node name="Fundo" type="TextureRect" parent="." unique_id=1163517808]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -23,7 +24,7 @@ texture = ExtResource("2_bg")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="Escurecedor" type="ColorRect" parent="."]
+[node name="Escurecedor" type="ColorRect" parent="." unique_id=2109140767]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -32,7 +33,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 0.55)
 
-[node name="Centro" type="CenterContainer" parent="."]
+[node name="Centro" type="CenterContainer" parent="." unique_id=846652372]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -40,22 +41,22 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBox" type="VBoxContainer" parent="Centro"]
+[node name="VBox" type="VBoxContainer" parent="Centro" unique_id=1386077241]
 layout_mode = 2
 theme_override_constants/separation = 28
 
-[node name="Titulo" type="Label" parent="Centro/VBox"]
+[node name="Titulo" type="Label" parent="Centro/VBox" unique_id=565746977]
 layout_mode = 2
 theme_override_font_sizes/font_size = 44
 text = "Escolha sua Classe"
 horizontal_alignment = 1
 
-[node name="Cartoes" type="HBoxContainer" parent="Centro/VBox"]
+[node name="Cartoes" type="HBoxContainer" parent="Centro/VBox" unique_id=1611856695]
 layout_mode = 2
 theme_override_constants/separation = 28
 alignment = 1
 
-[node name="Espadachin" type="Button" parent="Centro/VBox/Cartoes"]
+[node name="Espadachin" type="Button" parent="Centro/VBox/Cartoes" unique_id=1626485352]
 custom_minimum_size = Vector2(280, 200)
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
@@ -65,7 +66,7 @@ Guerreiro agressivo.
 Foco em dano e Força."
 autowrap_mode = 3
 
-[node name="Dragao" type="Button" parent="Centro/VBox/Cartoes"]
+[node name="Dragao" type="Button" parent="Centro/VBox/Cartoes" unique_id=1903568595]
 custom_minimum_size = Vector2(280, 200)
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
@@ -75,9 +76,8 @@ Tanque com Escamas.
 Invoca dragões temporários."
 autowrap_mode = 3
 
-[node name="BotaoVoltar" type="Button" parent="Centro/VBox"]
+[node name="BotaoVoltar" type="Button" parent="Centro/VBox" unique_id=1035435692]
 custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "Voltar"
-

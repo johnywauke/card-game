@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://drg00000015"]
+
+[ext_resource type="Script" uid="uid://bdxlpgi6w130y" path="res://Script/Resources/CardData.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"drg_labareda"
+nome = "Labareda"
+descricao = "Causa 5 de dano a todos os inimigos."
+tipo = 0
+raridade = 0
+alvo = 1
+custo = 1
+valor_base = 5
+fervor_ganho = 0
+fervor_custo = 0
+efeitos = []

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://drg00000006"]
+
+[ext_resource type="Script" uid="uid://bdxlpgi6w130y" path="res://Script/Resources/CardData.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"drg_reforco"
+nome = "Reforço Ósseo"
+descricao = "Ganha 3 de Escamas."
+tipo = 2
+raridade = 0
+alvo = 2
+custo = 1
+valor_base = 0
+fervor_ganho = 0
+fervor_custo = 0
+efeitos = [{ "tipo": "escamas", "valor": 3 }]

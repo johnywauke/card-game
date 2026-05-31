@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://drg00000002"]
+
+[ext_resource type="Script" uid="uid://bdxlpgi6w130y" path="res://Script/Resources/CardData.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"drg_courac"
+nome = "Couraça Dracônica"
+descricao = "Ganha 8 de bloqueio."
+tipo = 1
+raridade = 0
+alvo = 2
+custo = 2
+valor_base = 8
+fervor_ganho = 0
+fervor_custo = 0
+efeitos = []

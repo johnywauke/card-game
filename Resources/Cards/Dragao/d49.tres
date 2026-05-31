@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://drg0000005a"]
+
+[ext_resource type="Script" uid="uid://bdxlpgi6w130y" path="res://Script/Resources/CardData.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"drg_cinzas"
+nome = "Renascer das Cinzas"
+descricao = "Cura 12 de vida e ganha 2 de Escamas."
+tipo = 2
+raridade = 2
+alvo = 2
+custo = 2
+valor_base = 0
+fervor_ganho = 0
+fervor_custo = 0
+efeitos = [{ "tipo": "cura", "valor": 12 }, { "tipo": "escamas", "valor": 2 }]

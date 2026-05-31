@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://drg00000030"]
+
+[ext_resource type="Script" uid="uid://bdxlpgi6w130y" path="res://Script/Resources/CardData.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"drg_guardiao"
+nome = "Guardião Alado"
+descricao = "Invoca um guardião: ganha 5 de bloqueio por 3 turnos."
+tipo = 3
+raridade = 1
+alvo = 3
+custo = 2
+valor_base = 0
+fervor_ganho = 0
+fervor_custo = 0
+efeitos = [{ "tipo": "invocar", "turnos": 3, "efeito": { "tipo": "bloqueio", "valor": 5 } }]

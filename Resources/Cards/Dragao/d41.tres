@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://drg00000041"]
+
+[ext_resource type="Script" uid="uid://bdxlpgi6w130y" path="res://Script/Resources/CardData.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"drg_pacto"
+nome = "Pacto Ancestral"
+descricao = "Ganha 2 de Força e 2 de Destreza."
+tipo = 2
+raridade = 2
+alvo = 2
+custo = 2
+valor_base = 0
+fervor_ganho = 0
+fervor_custo = 0
+efeitos = [{ "tipo": "aplicar_status", "status": "forca", "valor": 2, "alvo": "usuario" }, { "tipo": "aplicar_status", "status": "destreza", "valor": 2, "alvo": "usuario" }]

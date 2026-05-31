@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://drg00000028"]
+
+[ext_resource type="Script" uid="uid://bdxlpgi6w130y" path="res://Script/Resources/CardData.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"drg_filhote"
+nome = "Filhote de Fogo"
+descricao = "Invoca um filhote: causa 3 de dano por 3 turnos."
+tipo = 3
+raridade = 0
+alvo = 3
+custo = 1
+valor_base = 0
+fervor_ganho = 0
+fervor_custo = 0
+efeitos = [{ "tipo": "invocar", "turnos": 3, "efeito": { "tipo": "dano", "valor": 3, "alvo": "inimigo" } }]

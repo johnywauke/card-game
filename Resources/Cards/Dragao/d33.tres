@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://drg00000033"]
+
+[ext_resource type="Script" uid="uid://bdxlpgi6w130y" path="res://Script/Resources/CardData.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"drg_wyrm"
+nome = "Wyrm Ancião"
+descricao = "Invoca um wyrm poderoso: causa 9 de dano por 2 turnos."
+tipo = 3
+raridade = 2
+alvo = 3
+custo = 3
+valor_base = 0
+fervor_ganho = 0
+fervor_custo = 0
+efeitos = [{ "tipo": "invocar", "turnos": 2, "efeito": { "tipo": "dano", "valor": 9, "alvo": "inimigo" } }]

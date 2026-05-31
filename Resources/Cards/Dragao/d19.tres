@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://drg0000002a"]
+
+[ext_resource type="Script" uid="uid://bdxlpgi6w130y" path="res://Script/Resources/CardData.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"drg_garras"
+nome = "Garras Dilacerantes"
+descricao = "Causa 4 de dano duas vezes."
+tipo = 0
+raridade = 0
+alvo = 0
+custo = 1
+valor_base = 4
+fervor_ganho = 0
+fervor_custo = 0
+efeitos = [{ "tipo": "dano", "valor": 4, "alvo": "inimigo" }]

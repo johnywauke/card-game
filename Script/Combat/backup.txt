@@ -1,0 +1,762 @@
+import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell, LabelList } from 'recharts';
+import { Download, ChevronLeft, ChevronRight, Film, Smartphone, Video, Layers, QrCode, X, Maximize, AlertCircle, FileSearch, ShieldAlert, MapPin, Eye } from 'lucide-react';
+
+/* ============================================================================
+ * WACE DOSSIÊ PRO - ADAPTADO PARA ALTINEU CÔRTES (EXPORT EDITION)
+ * * NOTA DE WORKFLOW: Após a exportação automática destes slides em GIF/PNG, 
+ * os arquivos são extraídos e montados em um arquivo MP4 (via editor/Canvas) 
+ * onde recebem a etapa final de edição e adição de narração (Voiceover).
+ * ============================================================================ */
+
+const useCountUp = (end, duration = 2000, active = true) => {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    if (!active) { setCount(0); return; }
+    let startTime = null;
+    const animate = (timestamp) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      setCount(end * (1 - Math.pow(1 - progress, 4))); // EaseOutQuart
+      if (progress < 1) window.requestAnimationFrame(animate);
+    };
+    const req = window.requestAnimationFrame(animate);
+    return () => window.cancelAnimationFrame(req);
+  }, [end, duration, active]);
+  return count;
+};
+
+// === DADOS OFICIAIS VERIFICADOS (ALTINEU CÔRTES - 2023 A 2026) ===
+// TOTAL GERAL: R$ 1.281.039,06
+const rawData = [
+  { name: 'Divulgação Parlamentar', short: 'Marketing', value: 754500.00 },
+  { name: 'Passagens Aéreas', short: 'Voos', value: 344412.51 },
+  { name: 'Locação de Veículos', short: 'Locação', value: 181500.00 },
+  { name: 'Outros (Telefonia/Despesas)', short: 'Outros', value: 626.55 }
+];
+
+const HEAT_COLORS = ['#ef4444', '#f97316', '#f59e0b', '#eab308', '#71717a', '#52525b', '#3f3f46'];
+const HEAT_COLORS_10 = ['#ef4444', '#f97316', '#ea580c', '#f59e0b', '#eab308', '#ca8a04', '#a16207', '#854d0e', '#71717a', '#52525b'];
+
+const totalGasto = rawData.reduce((acc, curr) => acc + curr.value, 0);
+
+// Fornecedores (Top 10 Agrupados meticulosamente)
+const suppliersData = [
+  { name: "CLIO / ORÁCULO (MESMO DONO)", location: "Sede Suspeita / Estacionamento", value: 595500.00 },
+  { name: "GOL LINHAS AÉREAS", location: "Passagens Aéreas", value: 230024.96 },
+  { name: "QUASAR LOCADORA DE VEÍCULOS", location: "Locação de Frota", value: 181500.00 },
+  { name: "R A NASCIMENTO CONSULTORIA", location: "Divulgação / Consultoria", value: 159000.00 },
+  { name: "AZUL LINHAS AÉREAS", location: "Passagens Aéreas", value: 70316.31 },
+  { name: "TAM LINHAS AÉREAS", location: "Passagens Aéreas", value: 44071.24 },
+  { name: "MANUTENÇÃO DE ESCRITÓRIO", location: "Escritório", value: 539.80 },
+  { name: "CUSTOS DE TELEFONIA (RAMAL)", location: "Telefonia", value: 86.75 }
+];
+
+// === DADOS DO PATRIMÔNIO DECLARADO ===
+// Patrimônio Revisado: R$ 1.270.912,37
+const assetsData = [
+  { name: "Casa", location: "Patrimônio Imobiliário", value: 450000.00 },
+  { name: "Veículos (5 unid.)", location: "Bens Móveis", value: 579891.01 },
+  { name: "Quotas de Capital", location: "Participação Societária", value: 100000.00 },
+  { name: "Terreno", location: "Patrimônio Imobiliário", value: 72002.31 },
+  { name: "Depósitos e Investimentos", location: "Liquidez", value: 69019.05 }
+];
+
+const totalPatrimonio = assetsData.reduce((acc, curr) => acc + curr.value, 0);
+
+const formatCurrency = (val) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
+const AVATAR_IMAGE_URL = ""; 
+
+// === COMPONENTES MENORES ===
+const AuditSeal = ({ text = "DADOS REAIS" }) => (
+  <div className="absolute top-[8%] right-[5%] z-50 transform rotate-12 pointer-events-none">
+    <div className="border-[3px] border-red-600/50 text-red-500 font-black text-lg px-3 py-1 rounded-lg uppercase tracking-[0.2em] bg-black/60 backdrop-blur-md shadow-[0_0_20px_rgba(239,68,68,0.3)]">{text}</div>
+  </div>
+);
+
+// RODAPÉ COM PAGINAÇÃO VISUAL (DOTS)
+const StandardFooter = ({ currentPage, totalPages = 8 }) => ( 
+  <div className="absolute bottom-0 left-0 w-full h-[190px] bg-[#030304]/95 backdrop-blur-xl border-t border-zinc-800/60 flex flex-col items-center justify-start pt-6 z-20 pointer-events-none shadow-[0_-20px_50px_rgba(0,0,0,0.9)]">
+    <div className="bg-amber-500/10 border border-amber-500/20 px-4 py-1.5 rounded-full mb-3 flex items-center justify-center transition-all duration-300">
+      <p className="text-[9px] text-amber-500 uppercase tracking-[0.15em] font-black flex items-center gap-1.5">
+        <span>SUGIRA O PRÓXIMO RAIO-X</span>
+        <span className="inline-block animate-bounce relative top-[1px] ml-1">👇</span>
+      </p>
+    </div>
+    <p className="text-zinc-300 text-sm font-black tracking-[0.4em] mb-1.5 drop-shadow-md">WACE.COM.BR</p>
+    
+    {/* Indicador de Progresso (Dots) */}
+    <div className="flex gap-1.5 mt-2 mb-2">
+      {Array.from({ length: totalPages }).map((_, i) => (
+        <div key={i} className={`h-1 rounded-full transition-all duration-500 ${i + 1 === currentPage ? 'w-4 bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.6)]' : 'w-1 bg-zinc-700'}`} />
+      ))}
+    </div>
+
+    <p className="text-[7px] text-zinc-500 uppercase tracking-[0.3em] font-bold opacity-80 mt-auto mb-4">Fonte: dadosabertos.camara.leg.br</p>
+  </div>
+);
+
+const SlideContainer = ({ children, center = false, currentPage }) => (
+  <div key={currentPage} className={`flex flex-col h-full w-full px-[8%] pt-[10%] pb-[360px] relative z-10 animate-in slide-in-from-right-4 fade-in duration-500 ${center ? 'items-center' : 'text-left'}`}>
+    {children}
+    {/* Glow de fundo global sutil */}
+    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150%] h-[50%] bg-red-900/5 blur-[120px] rounded-full pointer-events-none -z-10"></div>
+    <div className="absolute bottom-[215px] left-[6%] w-[88%] h-[120px] bg-zinc-950/60 backdrop-blur-md border border-zinc-800/80 rounded-[2rem] flex flex-col items-center justify-center z-20 pointer-events-none shadow-[0_0_30px_rgba(0,0,0,0.3)]"></div>
+    <StandardFooter currentPage={currentPage} />
+  </div>
+);
+
+const ExportBtn = ({ onClick, icon: Icon, label, color = "zinc" }) => {
+  const colors = {
+    zinc: "hover:bg-zinc-800 text-zinc-300",
+    amber: "bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 border-amber-500/20",
+    red: "bg-red-600/10 text-red-500 hover:bg-red-600/20 border-red-600/20",
+    emerald: "bg-emerald-600/10 text-emerald-500 hover:bg-emerald-600/20 border-emerald-600/20"
+  };
+  return (
+    <button onClick={onClick} className={`p-2 rounded-full border border-transparent transition-colors flex items-center gap-1.5 hover:scale-105 active:scale-95 ${label ? 'px-3' : ''} ${colors[color]}`}>
+      <Icon className={label ? "w-4 h-4" : "w-5 h-5"} />
+      {label && <span className="text-[10px] font-black uppercase">{label}</span>}
+    </button>
+  );
+};
+
+// === UTILS DE EXPORTAÇÃO ===
+const loadLibrary = (url, globalVar) => new Promise((resolve) => {
+  if (window[globalVar]) return resolve();
+  const s = document.createElement('script'); s.src = url; s.async = true; s.onload = resolve; document.head.appendChild(s);
+});
+
+const downloadFile = (filename, url) => {
+  const link = document.createElement('a'); link.download = filename; link.href = url; link.click();
+};
+
+const captureDOM = async (node, scale = 1) => {
+  const targetW = 1080 * scale, targetH = 1920 * scale;
+  return await window.htmlToImage.toPng(node, {
+    pixelRatio: (targetW / node.offsetWidth), 
+    canvasWidth: targetW, 
+    canvasHeight: targetH,
+    backgroundColor: '#000000', 
+    useCORS: true, 
+    cacheBust: true
+  });
+};
+
+const generateGif = (frames, fps, quality, targetW, targetH) => new Promise((resolve, reject) => {
+  window.gifshot.createGIF({
+    images: frames, 
+    gifWidth: targetW, 
+    gifHeight: targetH, 
+    interval: 1 / fps, 
+    numFrames: frames.length, 
+    quality: quality
+  }, obj => obj.error ? reject(obj.error) : resolve(obj.image));
+});
+
+export default function App() {
+  const printRef = useRef(null);
+  const touchStartX = useRef(null); 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [exportingState, setExportingState] = useState(null);
+  const [gifProgress, setGifProgress] = useState(0);
+  const [showQrInput, setShowQrInput] = useState(false);
+  const [cleanMode, setCleanMode] = useState(false);
+  
+  // Link 1: O Local do Estacionamento/Sede fantasma (Google Maps, Street View ou Matéria)
+  // Link 2: Wace.com.br
+  const initialUrls = "https://www.google.com/maps\nhttps://wace.com.br";
+  const [qrInputText, setQrInputText] = useState(initialUrls);
+
+  const parsedQrs = useMemo(() => {
+    const lines = qrInputText.split('\n').map(line => line.trim()).filter(line => line);
+    return [ lines[0] || "", lines[1] || "https://wace.com.br" ];
+  }, [qrInputText]);
+
+  // Navegação por teclado + Exit Clean Mode
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setCleanMode(false);
+      if (e.key === 'ArrowRight') setCurrentPage(p => Math.min(8, p + 1)); 
+      if (e.key === 'ArrowLeft') setCurrentPage(p => Math.max(1, p - 1));
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Animações Numéricas
+  const animTotalCapa = useCountUp(totalGasto, 2500, currentPage === 2); 
+  const animDoacoes = useCountUp(1375000.01, 2500, currentPage === 2);
+  const animGastosCampanha = useCountUp(1337469.00, 2500, currentPage === 2);
+  const animGovernismo = useCountUp(29, 2000, currentPage === 2);
+  const animPresenca = useCountUp(77, 2000, currentPage === 2);
+  const animPatrimonio = useCountUp(totalPatrimonio, 2500, currentPage === 3); 
+  
+  const chartProgress = useCountUp(1, 2000, currentPage === 4); 
+  const suppliersProgress = useCountUp(1, 2000, currentPage === 5); 
+  const assetsProgress = useCountUp(1, 2000, currentPage === 3);
+  
+  const animTotal = useCountUp(totalGasto, 2500, currentPage === 6); 
+  const animSalario = useCountUp(totalGasto / 1518 / 12, 2500, currentPage === 6); 
+  const animFamilias = useCountUp(totalGasto / (1518 * 0.7), 2500, currentPage === 6);
+  
+  const animatedChartData = useMemo(() => rawData.map(d => ({ ...d, animatedValue: d.value * chartProgress })), [chartProgress]);
+  const animatedSuppliersData = useMemo(() => suppliersData.map(d => ({ ...d, animatedValue: d.value * suppliersProgress })), [suppliersProgress]);
+  const animatedAssetsData = useMemo(() => assetsData.map(d => ({ ...d, animatedValue: d.value * assetsProgress })), [assetsProgress]);
+
+  // GESTÃO DE SWIPE (Mobile CX)
+  const handleTouchStart = (e) => { touchStartX.current = e.touches[0].clientX; };
+  const handleTouchEnd = (e) => {
+    if (touchStartX.current === null) return;
+    const touchEndX = e.changedTouches[0].clientX;
+    const diff = touchStartX.current - touchEndX;
+    if (diff > 50) setCurrentPage(p => Math.min(8, p + 1)); 
+    if (diff < -50) setCurrentPage(p => Math.max(1, p - 1)); 
+    touchStartX.current = null;
+  };
+
+  // EXPORTAÇÃO PNG
+  const handleExportPNG = async (batch = false) => {
+    if (!printRef.current || exportingState) return;
+    setExportingState(batch ? 'batchPNG' : 'singlePNG');
+    
+    await new Promise(r => setTimeout(r, 300)); 
+    
+    const original = currentPage;
+    try {
+      await loadLibrary('https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js', 'htmlToImage');
+      const pages = batch ? [1, 2, 3, 4, 5, 6, 7, 8] : [currentPage]; 
+      
+      for (const p of pages) {
+        setCurrentPage(p); setGifProgress(p);
+        await new Promise(r => setTimeout(r, batch ? 2600 : 100));
+        const dataUrl = await captureDOM(printRef.current, 1);
+        downloadFile(`WACE-Slide-${p}-1080p.png`, dataUrl);
+        if (batch) await new Promise(r => setTimeout(r, 800));
+      }
+    } catch (err) { console.error(err); } finally { setExportingState(null); setCurrentPage(original); }
+  };
+
+  // EXPORTAÇÃO GIF (V4 - Seguro & Estável)
+  const handleExportGIF = async (batch = false) => {
+    if (!printRef.current || exportingState) return;
+    setExportingState(batch ? 'batchGIF' : 'slideHD');
+    
+    await new Promise(r => setTimeout(r, 300)); 
+    
+    const original = currentPage;
+    try {
+      await loadLibrary('https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js', 'htmlToImage');
+      await loadLibrary('https://cdn.jsdelivr.net/npm/gifshot@0.4.5/dist/gifshot.min.js', 'gifshot');
+      
+      const fps = 15; 
+      const duration = 4; 
+      const totalFrames = fps * duration; 
+      const scale = 1; 
+      
+      const pages = batch ? [1, 2, 3, 4, 5, 6, 7, 8] : [currentPage]; 
+
+      for (const p of pages) {
+        setCurrentPage(0); await new Promise(r => setTimeout(r, 50));
+        setCurrentPage(p); setGifProgress(0); 
+        await new Promise(r => setTimeout(r, 500)); 
+
+        if (p === 8) { 
+          setGifProgress(100);
+          const dataUrl = await captureDOM(printRef.current, 1); 
+          downloadFile(`WACE-Slide-${p}-estatico.png`, dataUrl);
+          if (batch) await new Promise(r => setTimeout(r, 1500));
+          continue; 
+        }
+
+        let frames = [];
+        for (let i = 0; i < totalFrames; i++) {
+          frames.push(await captureDOM(printRef.current, scale));
+          setGifProgress(Math.round(((i + 1) / totalFrames) * 100));
+          await new Promise(r => setTimeout(r, 40)); 
+        }
+
+        const gifUrl = await generateGif(frames, fps, 5, 1080 * scale, 1920 * scale);
+        downloadFile(`WACE-Slide-${p}-${fps}fps.gif`, gifUrl);
+        
+        frames = []; 
+        if (batch) {
+          await new Promise(r => setTimeout(r, 3000)); 
+        }
+      }
+    } catch (err) { 
+      console.error(err); 
+      alert("Erro na exportação. Se o navegador travar em 'TODOS', tente exportar os GIFs um a um.");
+    } finally { 
+      setExportingState(null); 
+      setCurrentPage(original); 
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-[#060608] flex justify-center items-center font-sans text-zinc-100 overflow-hidden p-[2px]">
+      <style>{`
+        @keyframes scrollDots { 100% { background-position: 32px 32px; } }
+        @keyframes scannerSweep { 0%, 100% { opacity: 0; top: -5%; } 15%, 85% { opacity: 0.4; } 100% { top: 105%; } }
+        .terminal-dots { background-image: radial-gradient(#1a1a1e 1.5px, transparent 1.5px); background-size: 32px 32px; animation: scrollDots 10s linear infinite; }
+        .scanner-line { position: absolute; left: 0; width: 100%; height: 2px; background: rgba(239, 68, 68, 0.4); box-shadow: 0 0 35px 12px rgba(239, 68, 68, 0.2); animation: scannerSweep 6s ease-in-out infinite; z-index: 50; pointer-events: none; }
+        
+        /* HACK PARA FILMORA: Desacelera as animações CSS de fundo na hora do print */
+        .is-exporting .scanner-line { animation-duration: 25s !important; }
+        .is-exporting .animate-ping { animation-duration: 4s !important; }
+        .is-exporting .terminal-dots { animation-duration: 40s !important; }
+      `}</style>
+
+      {/* FERRAMENTAS */}
+      {!cleanMode && (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[100] flex flex-col gap-2 w-full max-w-[900px] items-center px-4 animate-in fade-in slide-in-from-top-4">
+          <div className="flex flex-wrap items-center justify-center bg-zinc-950/80 backdrop-blur-2xl border border-zinc-800 rounded-full p-1.5 shadow-2xl gap-1">
+            <div className="flex items-center px-3 py-1 bg-zinc-900 rounded-full mr-1">
+               <Smartphone className="w-4 h-4 text-zinc-500 mr-2"/>
+               <span className="text-[10px] font-black uppercase text-zinc-400 tracking-widest">9:16</span>
+            </div>
+            <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} className="p-2 hover:bg-zinc-800 rounded-full transition-transform active:scale-90"><ChevronLeft className="w-5 h-5" /></button>
+            <span className="text-sm font-mono font-bold px-2 text-zinc-400">{currentPage} / 8</span>
+            <button onClick={() => setCurrentPage(p => Math.min(8, p + 1))} className="p-2 hover:bg-zinc-800 rounded-full transition-transform active:scale-90"><ChevronRight className="w-5 h-5" /></button>
+            
+            <div className="w-[1px] h-6 bg-zinc-800 mx-1"></div>
+            
+            <ExportBtn onClick={() => setCleanMode(true)} icon={Maximize} label="MODO GRAVAÇÃO" color="emerald" />
+            
+            <div className="w-[1px] h-6 bg-zinc-800 mx-1"></div>
+            <ExportBtn onClick={() => handleExportPNG(false)} icon={Download} title="PNG Atual" />
+            <ExportBtn onClick={() => handleExportPNG(true)} icon={Layers} label="TODOS (PNG)" />
+            <div className="w-[1px] h-6 bg-zinc-800 mx-1"></div>
+            <ExportBtn onClick={() => handleExportGIF(false)} icon={Video} label={`SLIDE ${currentPage} (GIF)`} color="amber" />
+            <ExportBtn onClick={() => handleExportGIF(true)} icon={Film} label="TODOS (GIF)" color="red" />
+            <div className="w-[1px] h-6 bg-zinc-800 mx-1"></div>
+            <ExportBtn onClick={() => setShowQrInput(!showQrInput)} icon={QrCode} title="Editar QR" color={showQrInput ? "amber" : "zinc"} />
+          </div>
+
+          {showQrInput && (
+            <div className="bg-zinc-950 border border-zinc-800 p-4 rounded-2xl shadow-2xl w-[90vw] max-w-[400px] max-h-[60vh] flex flex-col z-[150] animate-in slide-in-from-top-4 fade-in">
+              <div className="flex justify-between items-center mb-4 border-b border-zinc-800 pb-2">
+                 <h3 className="text-xs font-black uppercase text-amber-500 tracking-widest">Configurar QR (Fonte)</h3>
+                 <button onClick={() => setShowQrInput(false)} className="hover:bg-zinc-900 p-1 rounded-full"><X className="w-4 h-4 text-zinc-500"/></button>
+              </div>
+              <div className="flex-grow overflow-hidden flex flex-col">
+                <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mb-2">Cole o link da fonte (O 1º link vai para a capa do Estacionamento)</p>
+                <textarea 
+                  value={qrInputText} onChange={(e) => setQrInputText(e.target.value)} placeholder="https://..."
+                  className="w-full flex-grow min-h-[250px] bg-zinc-900 text-[10px] text-zinc-300 p-3 rounded-lg border border-zinc-800 focus:outline-none focus:border-amber-500 font-mono whitespace-pre overflow-y-auto transition-colors"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* CANVAS PRINCIPAL (Com eventos de Swipe e bloqueio de seleção de texto) */}
+      <div 
+        ref={printRef} 
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        className={`relative bg-black overflow-hidden flex flex-col terminal-dots border-[2px] border-zinc-900/80 cursor-grab active:cursor-grabbing select-none ${exportingState ? 'is-exporting' : ''}`}
+        style={{ width: '100%', height: '100%', maxWidth: 'calc((100dvh - 4px) * (9/16))', maxHeight: 'calc(100vw * (16/9))', aspectRatio: '9/16', userSelect: 'none', WebkitUserSelect: 'none' }}
+      >
+        {(currentPage === 1 || currentPage === 2) && <div className="scanner-line"></div>}
+
+        {/* PÁGINA 1: CAPA TEASER / A REVELAÇÃO DO ESTACIONAMENTO */}
+        {currentPage === 1 && (
+          <SlideContainer center currentPage={1}>
+            <div className="absolute top-[8%] right-[5%] z-50 transform rotate-6 pointer-events-none">
+                <div className="border-[3px] border-amber-600/50 text-amber-500 font-black text-xs px-3 py-1 rounded-lg uppercase tracking-[0.2em] bg-black/60 backdrop-blur-md shadow-[0_0_20px_rgba(245,158,11,0.3)] flex items-center gap-1">
+                    <ShieldAlert className="w-4 h-4"/> EXCLUSIVO
+                </div>
+            </div>
+
+            <div className="w-full h-full flex-grow flex flex-col justify-start pt-10 pb-2 z-10">
+                {/* Título Principal */}
+                <div className="text-center mb-6 animate-in slide-in-from-top-4 fade-in duration-700">
+                    <h2 className="text-red-500 font-black tracking-[0.3em] uppercase text-xs mb-2">Auditoria Parlamentar</h2>
+                    <h1 className="text-white font-black text-5xl uppercase tracking-tighter leading-[0.9]">
+                        A Agência<br/>
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-amber-500">Fantasma?</span>
+                    </h1>
+                </div>
+
+                {/* Card de Resumo do Parlamentar (Miniatura) */}
+                <div className="bg-zinc-900/80 border border-zinc-800 rounded-3xl p-5 shadow-2xl relative overflow-hidden mb-6 w-full flex items-center gap-4">
+                    <div className="w-16 h-16 bg-zinc-800 rounded-full flex items-center justify-center border-2 border-zinc-700 overflow-hidden shadow-inner flex-shrink-0">
+                         {AVATAR_IMAGE_URL ? <img src={AVATAR_IMAGE_URL} crossOrigin="anonymous" className="w-full h-full object-cover" alt="Avatar" /> : 
+                         <Smartphone className="w-8 h-8 text-zinc-600" />}
+                    </div>
+                    <div>
+                        <h3 className="text-xl font-black text-white uppercase tracking-tight leading-tight">Altineu<br/>Côrtes</h3>
+                        <p className="text-zinc-500 font-bold uppercase tracking-[0.2em] text-[9px] mt-1">PL / RJ</p>
+                    </div>
+                </div>
+
+                {/* CARD DA REVELAÇÃO (A AGÊNCIA NO ESTACIONAMENTO) */}
+                <div className="bg-gradient-to-br from-red-950/40 to-black border border-red-900/50 rounded-3xl p-5 shadow-[0_0_40px_rgba(239,68,68,0.15)] relative overflow-hidden mb-auto w-full">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-600 to-amber-500"></div>
+                    
+                    <div className="flex items-center gap-2 mb-3">
+                        <MapPin className="w-5 h-5 text-red-500 animate-bounce" />
+                        <span className="text-zinc-300 font-black text-xs uppercase tracking-widest">Endereço Suspeito</span>
+                    </div>
+
+                    <p className="text-zinc-200 text-[13px] font-medium leading-relaxed mb-4">
+                        O parlamentar destinou <strong className="text-white">R$ 595.500,00</strong> para uma agência de publicidade que <strong className="text-red-400">mudou de nome</strong> (Clio/Oráculo) para continuar recebendo.
+                    </p>
+                    
+                    <div className="bg-black/60 rounded-xl p-3 border border-red-900/30 flex items-start gap-3">
+                        <Eye className="w-5 h-5 text-amber-500 mt-0.5 flex-shrink-0" />
+                        <p className="text-amber-500 font-bold text-xs leading-snug">
+                            O endereço oficial registrado destas empresas aponta para o que parece ser apenas um <strong className="text-red-400 uppercase">estacionamento de carros</strong>.
+                        </p>
+                    </div>
+                </div>
+
+                {/* Chamada para Ação com QR Code da Prova */}
+                <div className="mt-6 flex flex-col items-center justify-center w-full">
+                    <p className="text-zinc-400 text-[10px] uppercase font-black tracking-[0.2em] mb-3 text-center">
+                        Veja o endereço com seus próprios olhos
+                    </p>
+                    
+                    <div className="bg-white p-2.5 rounded-2xl shadow-[0_0_30px_rgba(239,68,68,0.2)] transition-transform duration-300 hover:scale-105 border-4 border-red-500/20">
+                         {/* Usamos o primeiro link da fonte como o QR principal deste resumo (Idealmente um link pro Google Street View) */}
+                        <img src={`https://quickchart.io/qr?text=${encodeURIComponent(parsedQrs[0])}&size=120&margin=0`} alt="QR Code Endereço" crossOrigin="anonymous" className="w-24 h-24 object-contain" />
+                    </div>
+                    
+                    <div className="mt-5 flex items-center gap-2 text-red-500 animate-pulse">
+                        <span className="text-[10px] font-black uppercase tracking-widest">Arraste para ver os gastos</span>
+                        <ChevronRight className="w-4 h-4" />
+                    </div>
+                </div>
+            </div>
+          </SlideContainer>
+        )}
+
+        {/* PÁGINA 2: CAPA ORIGINAL DOS DADOS */}
+        {currentPage === 2 && (
+          <SlideContainer center currentPage={2}>
+            <div className="w-full h-full flex-grow flex flex-col justify-center gap-4 z-10 pt-4 pb-2">
+              {/* HEADER: FOTO + NOME */}
+              <div className="w-full flex flex-col items-center group">
+                <div className="w-[120px] aspect-[3/4] bg-zinc-900 rounded-[2rem] border-[4px] border-zinc-800 overflow-hidden relative shadow-[0_20px_40px_-10px_rgba(0,0,0,0.8)] z-20 transition-transform duration-500 group-hover:scale-[1.02]">
+                  {AVATAR_IMAGE_URL ? <img src={AVATAR_IMAGE_URL} crossOrigin="anonymous" className="w-full h-full object-cover" alt="Avatar" /> : 
+                  <div className="w-full h-full flex items-center justify-center bg-[#0a0a0c]"><span className="text-zinc-700 font-black text-[12px] tracking-widest">SEM FOTO</span></div>}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent"></div>
+                  <div className="absolute top-0 left-0 w-full h-1 bg-red-600/30 shadow-[0_0_15px_rgba(239,68,68,0.5)] animate-[scannerSweep_6s_infinite]"></div>
+                </div>
+
+                <div className="text-center space-y-1 w-full flex flex-col items-center pt-8 pb-4 px-4 bg-gradient-to-b from-zinc-900/80 to-zinc-950 border border-zinc-800/80 rounded-[2.5rem] relative -mt-6 shadow-xl transition-colors duration-300 group-hover:border-zinc-700">
+                  <h1 className="font-black uppercase tracking-tighter text-white leading-[0.85] py-1 text-center">
+                     <span className="block text-zinc-100 text-[26px]">Altineu</span>
+                     <span className="block text-transparent bg-clip-text bg-gradient-to-b from-white to-zinc-500 text-[42px]">Côrtes</span>
+                  </h1>
+                  <div className="bg-zinc-950 border border-zinc-800/80 text-zinc-400 px-4 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-[0.4em] mt-1">
+                    PL/RJ
+                  </div>
+                </div>
+              </div>
+
+              {/* KPIs (GRID DE 3) */}
+              <div className="grid grid-cols-3 gap-2 w-full px-1">
+                <div className="bg-zinc-900/60 border border-zinc-800 rounded-[1.2rem] p-3 flex flex-col items-center justify-center shadow-md relative overflow-hidden transition-all duration-300 hover:bg-zinc-800/60 hover:scale-[1.02]">
+                  <span className="text-[22px] font-black text-amber-500 leading-none mb-1 mt-1">{Math.round(animGovernismo)}%</span>
+                  <span className="text-[8px] text-zinc-400 font-bold uppercase tracking-widest text-center">Governismo Baixo</span>
+                </div>
+                <div className="bg-zinc-900/60 border border-zinc-800 rounded-[1.2rem] p-3 flex flex-col items-center justify-center shadow-md relative overflow-hidden transition-all duration-300 hover:bg-zinc-800/60 hover:scale-[1.02]">
+                  <span className="text-[22px] font-black text-white leading-none mb-1 mt-1">{Math.round(animPresenca)}%</span>
+                  <span className="text-[8px] text-zinc-400 font-bold uppercase tracking-widest text-center">Presença Média</span>
+                </div>
+                <div className="bg-emerald-900/20 border border-emerald-800/50 rounded-[1.2rem] p-3 flex flex-col items-center justify-center shadow-md relative overflow-hidden transition-all duration-300 hover:bg-emerald-900/40 hover:scale-[1.02]">
+                  <div className="absolute inset-0 bg-gradient-to-b from-emerald-500/10 to-transparent"></div>
+                  <span className="text-[22px] font-black text-emerald-400 leading-none mb-1 mt-1 relative z-10">0</span>
+                  <span className="text-[8px] text-emerald-500 font-bold uppercase tracking-widest text-center relative z-10">Processos</span>
+                </div>
+              </div>
+
+              {/* CAMPANHA 2022 */}
+              <div className="w-full bg-zinc-900/80 border border-zinc-800 rounded-[1.5rem] p-4 flex flex-col shadow-lg transition-all duration-300 hover:border-zinc-700">
+                <div className="flex items-center gap-1.5 mb-3">
+                  <span className="text-[10px] font-black uppercase text-amber-500 tracking-[0.2em]">Campanha 2022</span>
+                </div>
+                <div className="flex justify-between items-center w-full gap-3">
+                  <div className="flex-1 bg-black/50 rounded-xl p-3 border border-zinc-800/60 transition-colors duration-300 hover:bg-black/80">
+                    <span className="block text-[8px] text-zinc-500 uppercase font-bold tracking-widest mb-1">Doações Recebidas</span>
+                    <span className="block text-[13px] text-white font-black tracking-tighter">{formatCurrency(animDoacoes)}</span>
+                  </div>
+                  <div className="flex-1 bg-black/50 rounded-xl p-3 border border-zinc-800/60 transition-colors duration-300 hover:bg-black/80">
+                    <span className="block text-[8px] text-zinc-500 uppercase font-bold tracking-widest mb-1">Gastos Declarados</span>
+                    <span className="block text-[13px] text-white font-black tracking-tighter">{formatCurrency(animGastosCampanha)}</span>
+                  </div>
+                </div>
+              </div>
+              
+              {/* CUSTO MANDATO */}
+              <div className="group bg-gradient-to-b from-red-950/40 to-zinc-950/90 border border-red-900/50 rounded-[1.5rem] p-4 relative flex flex-col items-center shadow-[0_10px_40px_rgba(239,68,68,0.15)] text-center w-full overflow-hidden transition-all duration-500 hover:shadow-[0_10px_50px_rgba(239,68,68,0.25)]">
+                <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-red-600 to-amber-500"></div>
+                
+                <div className="flex items-center gap-1.5 mb-2 mt-1">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500 transition-colors group-hover:bg-red-400"></span>
+                  </span>
+                  <span className="text-red-500 text-[9px] font-black uppercase tracking-[0.3em]">Custo Auditado (Mandato)</span>
+                </div>
+
+                <h2 className="text-[32px] font-black text-white tracking-tighter leading-none tabular-nums drop-shadow-lg mb-2 group-hover:scale-105 transition-transform duration-300">
+                  {formatCurrency(animTotalCapa)}
+                </h2>
+
+                <p className="text-zinc-400 text-[10px] leading-snug font-bold uppercase tracking-[0.2em] px-2">
+                  Mandato focado em <strong className="text-red-400">agências</strong> e <strong className="text-red-400">voos</strong>.
+                </p>
+              </div>
+            </div>
+          </SlideContainer>
+        )}
+
+        {/* PÁGINA 3: PATRIMÔNIO DECLARADO */}
+        {currentPage === 3 && (
+          <SlideContainer currentPage={3}>
+            <AuditSeal text="ELEIÇÕES 2022" />
+            <div className="space-y-1 mb-5">
+              <div className="flex items-center text-amber-500"><p className="font-black uppercase tracking-[0.2em] text-[10px]">TSE • DivulgaCandContas</p></div>
+              <h1 className="text-[46px] font-black uppercase tracking-tighter text-white leading-[0.9]">Bens<br/>Declarados</h1>
+            </div>
+
+            <div className="bg-gradient-to-b from-amber-950/30 to-zinc-900/60 border border-amber-900/50 rounded-2xl p-4 text-center relative overflow-hidden shadow-xl mb-4 mt-2 transition-all duration-300 hover:border-amber-700/50">
+                <div className="absolute top-0 left-0 w-full h-1 bg-amber-500"></div>
+                <p className="text-zinc-400 font-black text-[10px] uppercase tracking-[0.3em] mb-1 mt-1">Total Informado</p>
+                <p className="text-[34px] font-black text-amber-500 tracking-tighter leading-none tabular-nums">
+                    {formatCurrency(animPatrimonio)}
+                </p>
+            </div>
+
+            <div className="flex-grow flex flex-col justify-start gap-2">
+              {animatedAssetsData.map((asset, idx) => {
+                return (
+                  <div key={idx} className={`flex flex-row items-center justify-between border rounded-xl p-3 relative overflow-hidden shadow-md transition-all duration-300 hover:scale-[1.02] cursor-default bg-zinc-900/50 border-zinc-800 hover:bg-zinc-800/80`}>
+                    <div className="absolute top-0 left-0 w-1.5 h-full bg-amber-500"></div>
+                    <div className="min-w-0 flex-1 pl-3 pr-2 pt-1">
+                      <h3 className="font-black uppercase tracking-wide truncate w-full leading-tight text-[14px] text-white">{asset.name}</h3>
+                      <p className="text-zinc-500 text-[10px] font-black uppercase mt-0.5">{asset.location}</p>
+                    </div>
+                    <div className="flex flex-col items-end flex-shrink-0 pr-1">
+                      <span className="font-black tracking-tighter text-[19px] text-white">{formatCurrency(asset.animatedValue)}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </SlideContainer>
+        )}
+
+        {/* PÁGINA 4: GRÁFICO */}
+        {currentPage === 4 && (
+          <SlideContainer currentPage={4}>
+            <div className="mb-8">
+              <div className="flex items-center text-red-500 mb-1"><p className="font-black uppercase tracking-[0.2em] text-[10px]">Gastos</p></div>
+              <h1 className="text-[46px] font-black uppercase tracking-tighter text-white leading-[0.9] mb-8">O Fosso<br/>Financeiro</h1>
+              <div className="bg-zinc-900 border-l-4 border-amber-500 p-4 shadow-lg rounded-r-xl transition-all duration-300 hover:bg-zinc-800/80">
+                <p className="text-zinc-200 text-[13px] font-bold leading-relaxed">
+                  Sem despesas de escritório, quase a totalidade da verba do mandato foi consumida por passagens aéreas, locadoras de veículos e empresas de marketing.
+                </p>
+              </div>
+            </div>
+            <div className="flex-grow w-full py-2 overflow-hidden">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={animatedChartData} layout="vertical" margin={{ top: 0, right: 120, left: -20, bottom: 0 }}>
+                  <XAxis type="number" hide domain={[0, rawData[0].value]} />
+                  <YAxis dataKey="short" type="category" width={110} tick={{ fill: '#71717a', fontSize: 13, fontWeight: 900 }} axisLine={false} tickLine={false} />
+                  <Bar dataKey="animatedValue" radius={[0, 6, 6, 0]} barSize={34} isAnimationActive={false}>
+                    {animatedChartData.map((entry, index) => <Cell key={index} fill={HEAT_COLORS[index]} className="transition-all duration-300 hover:opacity-80 cursor-pointer" />)}
+                    <LabelList dataKey="animatedValue" position="right" content={(props) => <text x={props.x + props.width + 10} y={props.y + 22} fill={HEAT_COLORS[props.index]} fontSize={14} fontWeight="900">{formatCurrency(props.value)}</text>} />
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </SlideContainer>
+        )}
+
+        {/* PÁGINA 5: FORNECEDORES */}
+        {currentPage === 5 && (
+          <SlideContainer currentPage={5}>
+            <AuditSeal text="A ROTA" />
+            <div className="space-y-1 mb-6">
+              <div className="flex items-center text-red-500"><p className="font-black uppercase tracking-[0.2em] text-[10px]">Beneficiários</p></div>
+              <h1 className="text-[46px] font-black uppercase tracking-tighter text-white leading-[0.9]">Para Onde<br/>Foi o Valor</h1>
+            </div>
+            <div className="flex-grow flex flex-col justify-start mb-2 gap-1.5">
+              {animatedSuppliersData.map((supplier, idx) => {
+                // Tática V3: Foco no Top 3 (Redução de Carga Cognitiva no vídeo)
+                const isTop3 = idx < 3;
+                return (
+                  <div key={idx} className={`flex flex-row items-center justify-between border rounded-xl relative overflow-hidden shadow-md transition-all duration-300 cursor-default ${isTop3 ? 'bg-zinc-800/80 border-zinc-700 p-3 hover:scale-[1.02]' : 'bg-zinc-900/40 border-zinc-800/60 p-2 opacity-85 hover:opacity-100'}`}>
+                    <div className="absolute top-0 left-0 w-1.5 h-full" style={{ backgroundColor: HEAT_COLORS_10[idx] || '#52525b' }}></div>
+                    <div className="min-w-0 flex-1 pl-3 pr-2">
+                      <h3 className={`text-white font-black uppercase tracking-wide truncate w-full leading-tight ${isTop3 ? 'text-[14px]' : 'text-[11px]'}`}>{idx + 1}. {supplier.name}</h3>
+                      <p className={`text-zinc-500 font-black uppercase mt-0.5 ${isTop3 ? 'text-[10px]' : 'text-[8px]'}`}>{supplier.location}</p>
+                    </div>
+                    <div className="flex flex-col items-end flex-shrink-0 pr-1">
+                      <span className={`font-black tracking-tighter ${isTop3 ? 'text-[20px] text-white' : 'text-[15px] text-zinc-300'}`} style={{ color: isTop3 ? HEAT_COLORS_10[idx] : '#a1a1aa' }}>{formatCurrency(supplier.animatedValue)}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </SlideContainer>
+        )}
+
+        {/* PÁGINA 6: IMPACTO SOCIAL */}
+        {currentPage === 6 && (
+          <SlideContainer currentPage={6}>
+            <div className="space-y-1 mb-6">
+              <div className="flex items-center text-red-500"><p className="font-black uppercase tracking-[0.2em] text-[10px]">Impacto</p></div>
+              <h1 className="text-[46px] font-black uppercase tracking-tighter text-white leading-[0.9]">Custo<br/>Social</h1>
+            </div>
+            <div className="flex-grow flex flex-col justify-center space-y-4">
+              <div className="bg-zinc-900/60 border border-zinc-800 rounded-[2.5rem] overflow-hidden shadow-[0_40px_80px_-15px_rgba(0,0,0,0.8)] backdrop-blur-2xl transition-all duration-500 hover:border-zinc-700">
+                <div className="p-8 border-b border-zinc-800 bg-zinc-950/80 text-center relative overflow-hidden">
+                   <div className="absolute inset-0 bg-gradient-to-b from-red-600/5 to-transparent"></div>
+                  <p className="text-zinc-500 font-black text-[10px] uppercase tracking-[0.3em] mb-3 relative z-10">Total Consumido (Cotas do Mandato)</p>
+                  <p className="text-[40px] font-black text-white tracking-tighter leading-none tabular-nums relative z-10">{formatCurrency(animTotal)}</p>
+                </div>
+                <div className="p-6 space-y-4 bg-zinc-950/40">
+                  <div className="flex flex-col justify-center bg-gradient-to-r from-red-950/20 to-zinc-950/50 border border-red-900/20 p-5 rounded-[2rem] transition-transform duration-300 hover:scale-[1.03]">
+                    <p className="text-[28px] font-black text-red-500 leading-none tracking-tighter">{animSalario.toFixed(1).replace('.', ',')} Anos</p>
+                    <p className="text-[11px] text-zinc-500 uppercase font-black mt-2 tracking-widest opacity-80">Trabalho (Salário Mínimo)</p>
+                  </div>
+                  <div className="flex flex-col justify-center bg-gradient-to-r from-orange-950/20 to-zinc-950/50 border border-orange-900/20 p-5 rounded-[2rem] transition-transform duration-300 hover:scale-[1.03]">
+                    <p className="text-[28px] font-black text-orange-500 leading-none tracking-tighter">{Math.floor(animFamilias).toLocaleString('pt-BR')} Famílias</p>
+                    <p className="text-[11px] text-zinc-500 uppercase font-black mt-2 tracking-widest opacity-80">Alimentadas (Cesta Básica)</p>
+                  </div>
+                </div>
+                <div className="p-6 bg-zinc-950/90 border-t border-zinc-800">
+                  <p className="text-[11px] font-black uppercase text-red-500 tracking-[0.3em] mb-3">Resumo Executivo</p>
+                  <p className="text-zinc-300 text-[12px] leading-snug font-medium text-justify">
+                    A auditoria revela gastos de <strong className="text-white">R$ 1,28 milhão</strong>. O perfil aponta um consumo atípico em marketing, destacando-se quase <strong className="text-red-400">R$ 600 mil</strong> injetados em um único grupo (Clio/Oráculo) com sede em um estacionamento, além de alto custo com frotas e voos.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </SlideContainer>
+        )}
+
+        {/* PÁGINA 7: CTA */}
+        {currentPage === 7 && (
+          <SlideContainer center currentPage={7}>
+            <AuditSeal text="SUA VEZ" />
+            <div className="flex flex-col items-center justify-center w-full flex-grow mt-8">
+              <div className="flex items-center text-amber-500 mb-4">
+                <p className="font-black uppercase tracking-[0.3em] text-[12px]">A Auditoria Continua</p>
+              </div>
+
+              <h1 className="text-[46px] font-black uppercase tracking-tighter text-white leading-[0.9] text-center mb-10">
+                Quer ajudar<br/>o seu país?
+              </h1>
+
+              <div className="w-[95%] flex flex-col gap-4">
+                <div className="bg-gradient-to-r from-red-950/40 to-zinc-900/80 border border-red-900/30 rounded-[2rem] p-5 shadow-xl relative overflow-hidden flex flex-col gap-1 transition-all duration-300 hover:scale-[1.03] cursor-pointer">
+                  <div className="absolute left-0 top-0 w-1.5 h-full bg-red-600"></div>
+                  <h3 className="text-white font-black text-[17px] uppercase tracking-wide">Espalhe a Verdade</h3>
+                  <p className="text-zinc-400 text-[12px] font-medium leading-snug">Faça a sua parte. Envie este dossiê e ajude a expor como o seu dinheiro é gasto.</p>
+                </div>
+
+                <div className="bg-gradient-to-r from-amber-950/40 to-zinc-900/80 border border-amber-900/30 rounded-[2rem] p-5 shadow-xl relative overflow-hidden flex flex-col gap-1 transition-all duration-300 hover:scale-[1.03] cursor-pointer">
+                  <div className="absolute left-0 top-0 w-1.5 h-full bg-amber-500"></div>
+                  <h3 className="text-white font-black text-[17px] uppercase tracking-wide">Escolha o Próximo</h3>
+                  <p className="text-zinc-400 text-[12px] font-medium leading-snug">A auditoria não para. Comente qual político ou cargo devemos colocar no Raio-X.</p>
+                </div>
+              </div>
+
+              {/* Tática V3: CTA agressivo visual para apontar aos comentários do TikTok/Reels */}
+              <div className="mt-14 flex flex-col items-center animate-bounce">
+                <p className="text-amber-500 text-[12px] font-black uppercase tracking-[0.4em] mb-3 drop-shadow-md">Comente Abaixo</p>
+                <div className="bg-amber-500 p-3 rounded-full shadow-[0_0_20px_rgba(245,158,11,0.4)]">
+                  <ChevronRight className="w-8 h-8 text-black rotate-90" strokeWidth={3} />
+                </div>
+              </div>
+            </div>
+          </SlideContainer>
+        )}
+
+        {/* PÁGINA 8: NOTAS FISCAIS */}
+        {currentPage === 8 && (
+          <SlideContainer currentPage={8}>
+            <div className="space-y-1 mb-6">
+              <div className="flex items-center text-amber-500"><p className="font-black uppercase tracking-[0.2em] text-[10px]">Transparência</p></div>
+              <h1 className="text-[46px] font-black uppercase tracking-tighter text-white leading-[0.9]">Onde<br/>Conferir</h1>
+            </div>
+            
+            <div className="flex-grow flex flex-col justify-center w-full min-h-0 pb-2">
+              <div className="bg-zinc-900/60 border border-zinc-800 rounded-[2.5rem] p-6 shadow-[0_40px_80px_-15px_rgba(0,0,0,0.8)] backdrop-blur-2xl w-full flex flex-col items-center">
+                
+                <div className="w-full flex items-center justify-between mb-8 border-b border-zinc-800/80 pb-4">
+                   <div className="flex items-center gap-2">
+                     <span className="text-[12px] font-black uppercase text-zinc-300 tracking-[0.2em]">Valide as informações</span>
+                   </div>
+                   <div className="bg-amber-500/20 border border-amber-500/30 text-amber-500 px-3 py-1 rounded-full flex items-center transition-all duration-300 hover:bg-amber-500/30 cursor-default">
+                      <span className="text-[10px] font-black tracking-widest">{parsedQrs.filter(u => u !== "").length} LINKS</span>
+                   </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-6 w-full mb-4">
+                  {parsedQrs.map((url, i) => (
+                    <div key={i} className="flex flex-col items-center w-full">
+                      <div className="bg-zinc-950 border border-zinc-800 rounded-[1.5rem] p-3 flex flex-col items-center justify-center relative shadow-inner aspect-square w-full mb-3 group transition-transform duration-300 hover:scale-105">
+                        {url ? (
+                          <div className="bg-white p-2 rounded-2xl w-full h-full flex items-center justify-center">
+                            <img src={`https://quickchart.io/qr?text=${encodeURIComponent(url)}&size=300&margin=0`} alt="QR" crossOrigin="anonymous" className="w-full h-full object-contain" />
+                          </div>
+                        ) : (
+                          <div className="opacity-20 flex flex-col items-center justify-center h-full">
+                            <span className="text-zinc-600 font-black text-4xl mb-1">?</span>
+                          </div>
+                        )}
+                        <div className="absolute inset-0 border-2 border-transparent group-hover:border-amber-500/50 rounded-[1.5rem] transition-colors pointer-events-none"></div>
+                      </div>
+                      <span className="text-[11px] font-black text-zinc-400 uppercase tracking-widest text-center">
+                        {i === 0 ? "Fonte Oficial / Endereço" : "Portal Wace"}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-4 text-center w-full bg-zinc-950/60 p-4 rounded-2xl border border-zinc-800/60 transition-colors duration-300 hover:border-zinc-700">
+                   <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-[0.2em] leading-relaxed">Acesse os dados diretamente no Portal da Transparência, TSE e Imprensa.</p>
+                </div>
+                
+              </div>
+            </div>
+          </SlideContainer>
+        )}
+
+      </div>
+
+      {/* LOADING */}
+      {exportingState && (
+        <div className="fixed inset-0 z-[200] bg-black/95 backdrop-blur-md flex flex-col items-center justify-center text-center animate-in fade-in duration-300">
+          <div className="w-48 h-48 relative mb-8">
+             <div className="absolute inset-0 border-8 border-zinc-900 rounded-full"></div>
+             <div className="absolute inset-0 border-8 border-amber-500 rounded-full border-t-transparent animate-spin"></div>
+             <div className="absolute inset-0 flex items-center justify-center flex-col">
+               <span className="text-4xl font-black text-white">
+                 {exportingState.includes('PNG') ? `${currentPage}/8` : `${gifProgress}%`}
+               </span>
+               <span className="text-[8px] font-black text-zinc-500 uppercase mt-2 tracking-widest">
+                 {exportingState.includes('PNG') ? 'Processando Slide' : 'Codificando frames'}
+               </span>
+             </div>
+          </div>
+          <p className="text-amber-500 text-xs font-black uppercase animate-pulse">Processando Exportação...</p>
+          {exportingState.includes('GIF') && (
+             <div className="mt-4 max-w-[80%] flex flex-col items-center gap-2 animate-in slide-in-from-bottom-2 fade-in">
+               <p className="text-red-500 text-[10px] font-bold">AVISO: A renderização de GIF exige bastante memória do sistema.</p>
+               <p className="text-zinc-400 text-[9px]">Por favor, não mude de aba nem clique noutros programas até concluir.</p>
+             </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}

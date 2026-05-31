@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://drg00000026"]
+
+[ext_resource type="Script" uid="uid://bdxlpgi6w130y" path="res://Script/Resources/CardData.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"drg_chama_conc"
+nome = "Chama Concentrada"
+descricao = "Causa 9 de dano."
+tipo = 0
+raridade = 0
+alvo = 0
+custo = 1
+valor_base = 9
+fervor_ganho = 0
+fervor_custo = 0
+efeitos = []

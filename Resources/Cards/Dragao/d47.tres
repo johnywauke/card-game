@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://drg00000047"]
+
+[ext_resource type="Script" uid="uid://bdxlpgi6w130y" path="res://Script/Resources/CardData.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"drg_olhar"
+nome = "Olhar Aterrorizante"
+descricao = "Aplica 3 de Vulnerável ao inimigo."
+tipo = 2
+raridade = 0
+alvo = 0
+custo = 1
+valor_base = 0
+fervor_ganho = 0
+fervor_custo = 0
+efeitos = [{ "tipo": "aplicar_status", "status": "vulneravel", "valor": 3, "alvo": "inimigo" }]
