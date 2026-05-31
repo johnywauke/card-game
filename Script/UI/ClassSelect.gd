@@ -3,7 +3,7 @@
 ## (monta o baralho certo no DeckManager) e segue para o combate.
 extends Control
 
-const CENA_COMBATE := "res://Scenes/Combat/Combat.tscn"
+const CENA_MAPA := "res://Scenes/Map/Map.tscn"
 
 @onready var botao_espadachin: Button = $Centro/VBox/Cartoes/Espadachin
 @onready var botao_dragao: Button = $Centro/VBox/Cartoes/Dragao
@@ -18,7 +18,7 @@ func _ready() -> void:
 
 func _escolher(classe: String) -> void:
 	DeckManager.iniciar_run(classe)
-	get_tree().change_scene_to_file(CENA_COMBATE)
+	get_tree().change_scene_to_file(CENA_MAPA)
 
 
 func _voltar() -> void:

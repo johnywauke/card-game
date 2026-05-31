@@ -34,6 +34,16 @@ func _ready() -> void:
 		dados_inimigo = load(INIMIGO_PADRAO) as EnemyData
 	if inimigo != null and dados_inimigo != null:
 		inimigo.aplicar_dados(dados_inimigo)
+		# Elite e Chefe são mais fortes (mais HP).
+		match DeckManager.tipo_no_atual:
+			"elite":
+				inimigo.hp_max = int(dados_inimigo.hp_max * 2.5)
+				inimigo.hp_atual = inimigo.hp_max
+				inimigo.nome_exibicao = dados_inimigo.nome + " (Elite)"
+			"chefe":
+				inimigo.hp_max = int(dados_inimigo.hp_max * 5)
+				inimigo.hp_atual = inimigo.hp_max
+				inimigo.nome_exibicao = dados_inimigo.nome + " (Chefe)"
 
 	# 4) Conecta a HUD (lê o HP já ajustado).
 	if hud != null and hud.has_method("configurar"):

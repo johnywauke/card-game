@@ -35,6 +35,20 @@ var run_iniciada: bool = false
 var hp_jogador: int = 70
 var hp_max_jogador: int = 70
 
+## --- Estado do MAPA ---
+## O mapa é uma lista de andares; cada andar é uma lista de nós.
+## Cada nó: { "tipo": String, "coluna": int, "ligacoes": Array[int] }
+##   tipo  -> "combate" | "elite" | "fogueira" | "chefe"
+##   coluna -> posição horizontal (para desenhar)
+##   ligacoes -> índices (na coluna seguinte) que este nó alcança
+var mapa: Array = []
+## Andar atual onde o jogador está (-1 = ainda não entrou no mapa).
+var andar_atual: int = -1
+## Índice, dentro do andar atual, do nó escolhido pelo jogador.
+var no_atual: int = -1
+## Tipo do nó que está sendo jogado agora (para o combate saber se é elite/chefe).
+var tipo_no_atual: String = "combate"
+
 # Baralho inicial padrão do Espadachin (caminho -> quantidade).
 ## --- Baralhos iniciais por classe ---
 const _DECK_ESPADACHIN := {
@@ -105,11 +119,99 @@ func iniciar_run(classe: String = "espadachin") -> void:
 	hp_max_jogador = 70
 	hp_jogador = 70
 	run_iniciada = true
+	_gerar_mapa()
 
 
 ## Encerra a run atual (chamado no game over).
 func encerrar_run() -> void:
 	run_iniciada = false
+	mapa = []
+	andar_atual = -1
+	no_atual = -1
+
+
+## --- Geração e navegação do MAPA ---
+
+## Gera um mapa simples com vários andares. Cada andar tem 1 a 3 nós.
+## O último andar é sempre o Chefe.
+func _gerar_mapa() -> void:
+	mapa = []
+	andar_atual = -1
+	no_atual = -1
+
+	var total_andares := 8
+	var contador_id := 0
+	for a in total_andares:
+		var andar: Array = []
+		if a == total_andares - 1:
+			# Último andar: o Chefe (nó único).
+			andar.append({ "id": contador_id, "tipo": "chefe", "coluna": 1, "ligacoes": [] })
+			contador_id += 1
+		else:
+			var qtd := randi_range(2, 3)  # 2 ou 3 nós por andar.
+			for col in qtd:
+				andar.append({
+					"id": contador_id,
+					"tipo": _sortear_tipo_no(a),
+					"coluna": col,
+					"ligacoes": [],
+				})
+				contador_id += 1
+		mapa.append(andar)
+
+	# Liga cada nó a 1-2 nós do andar seguinte (caminhos ramificados).
+	for a in total_andares - 1:
+		var atual: Array = mapa[a]
+		var proximo: Array = mapa[a + 1]
+		for no in atual:
+			var qtd_lig := 1 if proximo.size() == 1 else randi_range(1, 2)
+			var alvos := range(proximo.size())
+			alvos.shuffle()
+			var ligacoes: Array = []
+			for i in min(qtd_lig, alvos.size()):
+				ligacoes.append(alvos[i])
+			ligacoes.sort()
+			no["ligacoes"] = ligacoes
+
+
+## Sorteia o tipo de um nó conforme o andar (fogueira/elite ficam mais ao meio/fim).
+func _sortear_tipo_no(andar: int) -> String:
+	# Andares iniciais: mais combate. Depois aparecem elite e fogueira.
+	var r := randf()
+	if andar >= 2 and r < 0.20:
+		return "elite"
+	elif andar >= 1 and r < 0.35:
+		return "fogueira"
+	return "combate"
+
+
+## Retorna os nós que o jogador pode escolher AGORA.
+## Se ainda não entrou no mapa, são todos os nós do primeiro andar.
+## Senão, são os nós ligados ao nó atual, no próximo andar.
+func nos_disponiveis() -> Array:
+	if mapa.is_empty():
+		return []
+	if andar_atual < 0:
+		return mapa[0]
+	if andar_atual >= mapa.size() - 1:
+		return []  # já no chefe / fim.
+	var no: Dictionary = mapa[andar_atual][no_atual]
+	var proximos: Array = []
+	for idx in no["ligacoes"]:
+		proximos.append(mapa[andar_atual + 1][idx])
+	return proximos
+
+
+## Marca a escolha do jogador e avança o andar. Guarda o tipo do nó.
+func escolher_no(andar: int, indice: int) -> void:
+	andar_atual = andar
+	no_atual = indice
+	tipo_no_atual = mapa[andar][indice]["tipo"]
+
+
+## True se o jogador acabou de vencer o Chefe (fim da run).
+func venceu_chefe() -> bool:
+	return andar_atual == mapa.size() - 1 and mapa.size() > 0
 
 
 ## Sorteia até n cartas distintas do pool de recompensas da classe atual.

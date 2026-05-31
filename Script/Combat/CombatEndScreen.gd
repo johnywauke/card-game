@@ -6,6 +6,7 @@
 extends CanvasLayer
 
 const CENA_COMBATE := "res://Scenes/Combat/Combat.tscn"
+const CENA_MAPA := "res://Scenes/Map/Map.tscn"
 const CENA_MENU := "res://Scenes/UI/MainMenu.tscn"
 
 var jogador: Combatant
@@ -69,6 +70,20 @@ func _ao_vencer() -> void:
 	if jogador != null:
 		DeckManager.hp_jogador = jogador.hp_atual
 
+	# Venceu o Chefe? Fim da run (vitória final).
+	if DeckManager.venceu_chefe():
+		_titulo.text = "Você venceu a Torre! 🏆"
+		_limpar(_caixa_cartas)
+		_limpar(_rodape)
+		var voltar := Button.new()
+		voltar.custom_minimum_size = Vector2(240, 60)
+		voltar.add_theme_font_size_override("font_size", 24)
+		voltar.text = "Voltar ao Menu"
+		voltar.pressed.connect(_voltar_menu)
+		_rodape.add_child(voltar)
+		_raiz.visible = true
+		return
+
 	_titulo.text = "Vitória! Escolha uma carta:"
 	_limpar(_caixa_cartas)
 	_limpar(_rodape)
@@ -81,7 +96,7 @@ func _ao_vencer() -> void:
 	var pular := Button.new()
 	pular.custom_minimum_size = Vector2(160, 50)
 	pular.text = "Pular"
-	pular.pressed.connect(_proximo_combate)
+	pular.pressed.connect(_voltar_mapa)
 	_rodape.add_child(pular)
 
 	_raiz.visible = true
@@ -89,11 +104,12 @@ func _ao_vencer() -> void:
 
 func _escolher_recompensa(carta: CardData) -> void:
 	DeckManager.adicionar_carta(carta)
-	_proximo_combate()
+	_voltar_mapa()
 
 
-func _proximo_combate() -> void:
-	get_tree().change_scene_to_file(CENA_COMBATE)
+## Volta ao mapa para escolher o próximo nó.
+func _voltar_mapa() -> void:
+	get_tree().change_scene_to_file(CENA_MAPA)
 
 
 # --- DERROTA ---
