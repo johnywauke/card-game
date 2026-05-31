@@ -7,9 +7,8 @@ extends Control
 ## do sistema (no Windows: %APPDATA%/Godot/app_userdata/card/).
 const CAMINHO_SAVE: String = "user://savegame.json"
 
-## Cena do jogo a carregar ao clicar em Jogar.
-## Aponta para a cena de combate. Troque para a cena de mapa quando ela estiver pronta.
-const CENA_JOGO: String = "res://Scenes/Combat/Combat.tscn"
+## Cena de seleção de classe (abre ao começar um novo jogo).
+const CENA_SELECAO_CLASSE: String = "res://Scenes/UI/ClassSelect.tscn"
 
 @onready var botao_jogar: Button = $VBoxContainer/BotaoJogar
 @onready var botao_opcoes: Button = $VBoxContainer/BotaoOpcoes
@@ -17,19 +16,14 @@ const CENA_JOGO: String = "res://Scenes/Combat/Combat.tscn"
 
 
 func _ready() -> void:
-	# Se já existe um save, o botão principal vira "Continuar".
-	if _existe_save():
-		botao_jogar.text = "Continuar"
-	else:
-		botao_jogar.text = "Novo Jogo"
+	botao_jogar.text = "Novo Jogo"
 
 
 ## --- Sinais dos botões (conecte cada pressed() a estas funções no editor) ---
 
 func _on_botao_jogar_pressed() -> void:
-	# Inicia uma run nova (reseta o baralho do Espadachin e o HP).
-	DeckManager.iniciar_run()
-	get_tree().change_scene_to_file(CENA_JOGO)
+	# Vai para a seleção de classe, que inicia a run com o baralho escolhido.
+	get_tree().change_scene_to_file(CENA_SELECAO_CLASSE)
 
 
 func _on_botao_opcoes_pressed() -> void:

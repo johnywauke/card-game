@@ -74,7 +74,6 @@ static func _aplicar_efeito_extra(efeito: Dictionary, usuario: Combatant, alvo: 
 			usuario.ganhar_bloqueio(efeito.get("valor", 0))
 
 		"escamas":
-			# Escamas: armadura persistente (não some no fim do turno).
 			usuario.aplicar_status(&"escamas", efeito.get("valor", 0))
 
 		"cura":

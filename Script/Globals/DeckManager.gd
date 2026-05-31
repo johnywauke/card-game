@@ -36,14 +36,21 @@ var hp_jogador: int = 70
 var hp_max_jogador: int = 70
 
 # Baralho inicial padrão do Espadachin (caminho -> quantidade).
-const _DECK_INICIAL := {
+## --- Baralhos iniciais por classe ---
+const _DECK_ESPADACHIN := {
 	"res://Resources/Cards/corte.tres": 5,
 	"res://Resources/Cards/defender.tres": 4,
 	"res://Resources/Cards/quebra_guarda.tres": 1,
 }
+const _DECK_DRAGAO := {
+	"res://Resources/Cards/Dragao/d13.tres": 4,  # Sopro Flamejante
+	"res://Resources/Cards/Dragao/d01.tres": 4,  # Escama Endurecida
+	"res://Resources/Cards/Dragao/d03.tres": 1,  # Pele de Dragão (Escamas)
+	"res://Resources/Cards/Dragao/d28.tres": 1,  # Filhote de Fogo (invocação)
+}
 
-# Cartas que podem aparecer como recompensa pós-combate.
-const _POOL_RECOMPENSA := [
+## --- Pools de recompensa por classe (cartas que podem aparecer pós-combate) ---
+const _POOL_ESPADACHIN := [
 	"res://Resources/Cards/investida_pesada.tres",
 	"res://Resources/Cards/talho_duplo.tres",
 	"res://Resources/Cards/postura_de_ferro.tres",
@@ -52,6 +59,22 @@ const _POOL_RECOMPENSA := [
 	"res://Resources/Cards/rodopio.tres",
 	"res://Resources/Cards/decapitar.tres",
 ]
+# Para o dragão, sorteamos de quase todo o conjunto (exceto as do baralho base).
+const _POOL_DRAGAO := [
+	"res://Resources/Cards/Dragao/d04.tres", "res://Resources/Cards/Dragao/d06.tres",
+	"res://Resources/Cards/Dragao/d09.tres", "res://Resources/Cards/Dragao/d10.tres",
+	"res://Resources/Cards/Dragao/d12.tres", "res://Resources/Cards/Dragao/d18.tres",
+	"res://Resources/Cards/Dragao/d21.tres", "res://Resources/Cards/Dragao/d22.tres",
+	"res://Resources/Cards/Dragao/d24.tres", "res://Resources/Cards/Dragao/d27.tres",
+	"res://Resources/Cards/Dragao/d29.tres", "res://Resources/Cards/Dragao/d30.tres",
+	"res://Resources/Cards/Dragao/d32.tres", "res://Resources/Cards/Dragao/d33.tres",
+	"res://Resources/Cards/Dragao/d36.tres", "res://Resources/Cards/Dragao/d37.tres",
+	"res://Resources/Cards/Dragao/d41.tres", "res://Resources/Cards/Dragao/d43.tres",
+	"res://Resources/Cards/Dragao/d48.tres", "res://Resources/Cards/Dragao/d50.tres",
+]
+
+## Classe escolhida para a run atual ("espadachin" ou "dragao").
+var classe_atual: String = "espadachin"
 
 
 ## Define o baralho da run (chamado ao iniciar uma partida).
@@ -67,13 +90,16 @@ func adicionar_carta(carta: CardData) -> void:
 	baralho_mestre.append(carta.duplicar())
 
 
-## Inicia uma nova run: monta o baralho inicial do Espadachin e reseta o HP.
-func iniciar_run() -> void:
+## Inicia uma nova run com a classe escolhida ("espadachin" ou "dragao").
+## Monta o baralho inicial correspondente e reseta o HP.
+func iniciar_run(classe: String = "espadachin") -> void:
+	classe_atual = classe
+	var deck_def: Dictionary = _DECK_DRAGAO if classe == "dragao" else _DECK_ESPADACHIN
 	var inicial: Array[CardData] = []
-	for caminho in _DECK_INICIAL:
+	for caminho in deck_def:
 		var carta := load(caminho) as CardData
 		if carta != null:
-			for i in _DECK_INICIAL[caminho]:
+			for i in deck_def[caminho]:
 				inicial.append(carta)
 	definir_baralho(inicial)
 	hp_max_jogador = 70
@@ -86,9 +112,9 @@ func encerrar_run() -> void:
 	run_iniciada = false
 
 
-## Sorteia até n cartas distintas do pool de recompensas.
+## Sorteia até n cartas distintas do pool de recompensas da classe atual.
 func sortear_recompensas(n: int = 3) -> Array[CardData]:
-	var pool := _POOL_RECOMPENSA.duplicate()
+	var pool: Array = (_POOL_DRAGAO if classe_atual == "dragao" else _POOL_ESPADACHIN).duplicate()
 	pool.shuffle()
 	var resultado: Array[CardData] = []
 	for i in min(n, pool.size()):

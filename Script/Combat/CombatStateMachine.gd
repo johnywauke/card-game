@@ -29,8 +29,8 @@ var inimigos: Array[Combatant] = []
 @export var energia_maxima: int = 3
 var energia_atual: int = 0
 
-## Poderes recorrentes ativos no combate (ex: dragões invocados que atacam
-## todo turno). Cada item é um efeito aplicado no início do turno do jogador.
+## Dragões invocados ativos. Cada item: { "efeito": Dictionary, "turnos": int }.
+## Aplicados no início do turno do jogador; "turnos" diminui até expirarem.
 var poderes_ativos: Array[Dictionary] = []
 
 
@@ -67,10 +67,7 @@ func iniciar_turno_jogador() -> void:
 	energia_atual = energia_maxima
 	SignalBus.energia_alterada.emit(energia_atual, energia_maxima)
 	jogador.limpar_bloqueio()
-
-	# Dragões invocados agem no início do turno (atacam o inimigo, etc.).
 	_aplicar_poderes()
-
 	DeckManager.comprar_mao_inicial()
 
 	SignalBus.turno_jogador_iniciado.emit()
@@ -147,24 +144,38 @@ func iniciar_turno_inimigo() -> void:
 
 ## --- Fim de combate ---
 
-## --- Poderes recorrentes (dragões invocados) ---
+## --- Invocações temporárias (dragões que duram X turnos) ---
 
-## Procura nos efeitos da carta entradas que registram um poder recorrente,
-## no formato { "tipo": "invocar", "efeito": { ... } }, e as ativa.
+## Registra os dragões invocados pela carta, no formato de efeito:
+## { "tipo": "invocar", "turnos": 3, "efeito": { ... } }.
 func _registrar_poderes_da_carta(carta: CardData) -> void:
 	for ef in carta.efeitos:
 		if ef.get("tipo", "") == "invocar":
 			var recorrente: Dictionary = ef.get("efeito", {})
 			if not recorrente.is_empty():
-				poderes_ativos.append(recorrente)
+				poderes_ativos.append({
+					"efeito": recorrente,
+					"turnos": int(ef.get("turnos", 3)),
+				})
 
 
-## Aplica todos os poderes ativos (chamado no início do turno do jogador).
+## Aplica cada dragão ativo e reduz sua duração; remove os que expiraram.
+## Chamado no início do turno do jogador.
 func _aplicar_poderes() -> void:
-	for efeito in poderes_ativos:
-		CardEffects.aplicar_efeito_recorrente(efeito, jogador, inimigos)
-	# Um poder pode ter derrotado o inimigo.
-	_checar_vitoria()
+	var sobreviventes: Array[Dictionary] = []
+	for poder in poderes_ativos:
+		CardEffects.aplicar_efeito_recorrente(poder["efeito"], jogador, inimigos)
+		var turnos: int = poder["turnos"] - 1
+		if turnos > 0:
+			poder["turnos"] = turnos
+			sobreviventes.append(poder)
+	poderes_ativos = sobreviventes
+	_checar_vitoria()  # um dragão pode ter derrotado o inimigo.
+
+
+## Quantidade de dragões ativos (para a HUD, se quiser exibir).
+func dragoes_ativos() -> int:
+	return poderes_ativos.size()
 
 
 func _ao_inimigo_morrer(_inimigo) -> void:

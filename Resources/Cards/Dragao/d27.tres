@@ -6,7 +6,7 @@
 script = ExtResource("1_script")
 id = &"drg_dragaozinho"
 nome = "Invocar Dragãozinho"
-descricao = "No início de cada turno, causa 5 de dano ao inimigo."
+descricao = "Invoca um dragão: causa 5 de dano no início dos próximos 3 turnos."
 tipo = 3
 raridade = 1
 alvo = 3
@@ -14,4 +14,4 @@ custo = 2
 valor_base = 0
 fervor_ganho = 0
 fervor_custo = 0
-efeitos = [{ "tipo": "invocar", "efeito": { "tipo": "dano", "valor": 5, "alvo": "inimigo" } }]
+efeitos = [{ "tipo": "invocar", "turnos": 3, "efeito": { "tipo": "dano", "valor": 5, "alvo": "inimigo" } }]

@@ -1,10 +1,8 @@
 ## CombatEndScreen.gd
 ## Overlay (CanvasLayer) que cobre a tela quando o combate termina.
-##  - VITÓRIA: mostra 3 cartas de recompensa para escolher (some ao baralho)
-##            e segue para o próximo combate. Também permite pular.
+##  - VITÓRIA: mostra 3 cartas de recompensa (com etiqueta de tipo) para escolher.
 ##  - DERROTA: mostra "Derrota" e um botão para voltar ao menu (encerra a run).
-##
-## Usa CanvasLayer com camada acima da mão (Hand), para cobrir as cartas.
+## Camada acima da mão (Hand), para cobrir as cartas.
 extends CanvasLayer
 
 const CENA_COMBATE := "res://Scenes/Combat/Combat.tscn"
@@ -12,7 +10,7 @@ const CENA_MENU := "res://Scenes/UI/MainMenu.tscn"
 
 var jogador: Combatant
 
-var _raiz: Control          # container de tela cheia, mostrado só no fim.
+var _raiz: Control
 var _titulo: Label
 var _caixa_cartas: HBoxContainer
 var _rodape: HBoxContainer
@@ -26,14 +24,12 @@ func _ready() -> void:
 	_raiz.visible = false
 	add_child(_raiz)
 
-	# Fundo escuro que bloqueia cliques atrás.
 	var fundo := ColorRect.new()
-	fundo.color = Color(0, 0, 0, 0.72)
+	fundo.color = Color(0, 0, 0, 0.74)
 	fundo.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	fundo.mouse_filter = Control.MOUSE_FILTER_STOP
 	_raiz.add_child(fundo)
 
-	# Coluna central: título, cartas e rodapé.
 	var coluna := VBoxContainer.new()
 	coluna.alignment = BoxContainer.ALIGNMENT_CENTER
 	coluna.add_theme_constant_override("separation", 28)
@@ -42,7 +38,7 @@ func _ready() -> void:
 	_raiz.add_child(coluna)
 
 	_titulo = Label.new()
-	_titulo.add_theme_font_size_override("font_size", 48)
+	_titulo.add_theme_font_size_override("font_size", 46)
 	_titulo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_titulo.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	coluna.add_child(_titulo)
@@ -121,8 +117,6 @@ func _voltar_menu() -> void:
 	DeckManager.encerrar_run()
 	get_tree().change_scene_to_file(CENA_MENU)
 
-
-# --- Utilitário ---
 
 func _limpar(container: Node) -> void:
 	for filho in container.get_children():

@@ -1,7 +1,6 @@
 ## Hand.gd
 ## Mostra a mão do jogador como cartas CLICÁVEIS na parte de baixo da tela.
-## Usa um CanvasLayer para garantir que as cartas fiquem SEMPRE por cima de
-## tudo (cenário, sprites e HUD).
+## Usa CanvasLayer (sempre por cima) e CartaVisual (cartas com etiqueta de tipo).
 extends CanvasLayer
 
 var maquina: CombatStateMachine
@@ -10,7 +9,7 @@ var _linha: HBoxContainer
 
 
 func _ready() -> void:
-	layer = 10  # acima do canvas padrão (camada 0).
+	layer = 10
 
 	var painel := Control.new()
 	painel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -26,7 +25,7 @@ func _ready() -> void:
 	_linha.anchor_bottom = 1.0
 	_linha.offset_left = 0.0
 	_linha.offset_right = 0.0
-	_linha.offset_top = -240.0
+	_linha.offset_top = -260.0
 	_linha.offset_bottom = -20.0
 	_linha.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	painel.add_child(_linha)
