@@ -96,8 +96,10 @@ func ganhar_bloqueio(quantidade: int) -> void:
 
 
 ## Zera o bloqueio (chamado no início do turno do dono).
+## Com Escamas, o bloqueio não vai a zero: volta ao valor de Escamas
+## (armadura persistente do dragão). Sem Escamas, zera normalmente.
 func limpar_bloqueio() -> void:
-	bloqueio = 0
+	bloqueio = get_status(&"escamas")
 	SignalBus.bloqueio_ganho.emit(self, 0)
 
 

@@ -73,6 +73,13 @@ static func _aplicar_efeito_extra(efeito: Dictionary, usuario: Combatant, alvo: 
 		"bloqueio":
 			usuario.ganhar_bloqueio(efeito.get("valor", 0))
 
+		"escamas":
+			# Escamas: armadura persistente (não some no fim do turno).
+			usuario.aplicar_status(&"escamas", efeito.get("valor", 0))
+
+		"cura":
+			usuario.curar(efeito.get("valor", 0))
+
 		"dano":
 			# Golpe de dano adicional (permite cartas de golpe múltiplo).
 			# alvo: "inimigo" (o alvo mirado) ou "todos".
@@ -99,3 +106,14 @@ static func _aplicar_efeito_extra(efeito: Dictionary, usuario: Combatant, alvo: 
 
 		_:
 			push_warning("CardEffects: efeito desconhecido '%s'." % tipo)
+
+
+## Aplica um efeito recorrente (de um dragão invocado) a cada turno.
+## Escolhe o primeiro inimigo vivo como alvo para efeitos de dano único.
+static func aplicar_efeito_recorrente(efeito: Dictionary, jogador: Combatant, inimigos: Array) -> void:
+	var alvo: Combatant = null
+	for inimigo in inimigos:
+		if inimigo != null and inimigo.esta_vivo():
+			alvo = inimigo
+			break
+	_aplicar_efeito_extra(efeito, jogador, alvo, inimigos)

@@ -1,65 +1,68 @@
 ## CombatEndScreen.gd
-## Overlay que cobre a tela quando o combate termina.
-##  - VITÓRIA: mostra 3 cartas de recompensa para escolher (some ao baralho da run)
+## Overlay (CanvasLayer) que cobre a tela quando o combate termina.
+##  - VITÓRIA: mostra 3 cartas de recompensa para escolher (some ao baralho)
 ##            e segue para o próximo combate. Também permite pular.
 ##  - DERROTA: mostra "Derrota" e um botão para voltar ao menu (encerra a run).
 ##
-## Monta-se sozinho. O CombatSetup o instancia, o configura com o jogador
-## (para salvar o HP na vitória) e o deixa escondido até o combate acabar.
-extends Control
+## Usa CanvasLayer com camada acima da mão (Hand), para cobrir as cartas.
+extends CanvasLayer
 
 const CENA_COMBATE := "res://Scenes/Combat/Combat.tscn"
 const CENA_MENU := "res://Scenes/UI/MainMenu.tscn"
 
 var jogador: Combatant
 
+var _raiz: Control          # container de tela cheia, mostrado só no fim.
 var _titulo: Label
 var _caixa_cartas: HBoxContainer
 var _rodape: HBoxContainer
 
 
 func _ready() -> void:
-	# Cobre a tela inteira e começa escondido.
-	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	visible = false
+	layer = 20  # acima da mão (camada 10).
 
-	# Fundo escuro semitransparente que bloqueia cliques atrás.
+	_raiz = Control.new()
+	_raiz.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_raiz.visible = false
+	add_child(_raiz)
+
+	# Fundo escuro que bloqueia cliques atrás.
 	var fundo := ColorRect.new()
-	fundo.color = Color(0, 0, 0, 0.7)
+	fundo.color = Color(0, 0, 0, 0.72)
 	fundo.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	fundo.mouse_filter = Control.MOUSE_FILTER_STOP
-	add_child(fundo)
+	_raiz.add_child(fundo)
 
-	# Coluna central com título, cartas e rodapé.
+	# Coluna central: título, cartas e rodapé.
 	var coluna := VBoxContainer.new()
 	coluna.alignment = BoxContainer.ALIGNMENT_CENTER
-	coluna.add_theme_constant_override("separation", 24)
-	coluna.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	coluna.grow_horizontal = Control.GROW_DIRECTION_BOTH
-	coluna.grow_vertical = Control.GROW_DIRECTION_BOTH
-	add_child(coluna)
+	coluna.add_theme_constant_override("separation", 28)
+	coluna.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	coluna.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_raiz.add_child(coluna)
 
 	_titulo = Label.new()
 	_titulo.add_theme_font_size_override("font_size", 48)
 	_titulo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_titulo.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	coluna.add_child(_titulo)
 
 	_caixa_cartas = HBoxContainer.new()
 	_caixa_cartas.alignment = BoxContainer.ALIGNMENT_CENTER
-	_caixa_cartas.add_theme_constant_override("separation", 16)
+	_caixa_cartas.add_theme_constant_override("separation", 18)
+	_caixa_cartas.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	coluna.add_child(_caixa_cartas)
 
 	_rodape = HBoxContainer.new()
 	_rodape.alignment = BoxContainer.ALIGNMENT_CENTER
 	_rodape.add_theme_constant_override("separation", 16)
+	_rodape.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	coluna.add_child(_rodape)
 
-	# Escuta o fim do combate.
 	SignalBus.combate_vencido.connect(_ao_vencer)
 	SignalBus.combate_perdido.connect(_ao_perder)
 
 
-## Recebe a referência do jogador (para salvar o HP na vitória).
 func configurar(p_jogador: Combatant) -> void:
 	jogador = p_jogador
 
@@ -67,7 +70,6 @@ func configurar(p_jogador: Combatant) -> void:
 # --- VITÓRIA ---
 
 func _ao_vencer() -> void:
-	# Salva o HP atual do jogador para o próximo combate.
 	if jogador != null:
 		DeckManager.hp_jogador = jogador.hp_atual
 
@@ -75,20 +77,18 @@ func _ao_vencer() -> void:
 	_limpar(_caixa_cartas)
 	_limpar(_rodape)
 
-	# Mostra 3 cartas de recompensa.
 	for carta in DeckManager.sortear_recompensas(3):
-		var b := _botao_carta(carta)
+		var b := CartaVisual.criar(carta)
 		b.pressed.connect(_escolher_recompensa.bind(carta))
 		_caixa_cartas.add_child(b)
 
-	# Botão para pular a recompensa.
 	var pular := Button.new()
 	pular.custom_minimum_size = Vector2(160, 50)
 	pular.text = "Pular"
 	pular.pressed.connect(_proximo_combate)
 	_rodape.add_child(pular)
 
-	visible = true
+	_raiz.visible = true
 
 
 func _escolher_recompensa(carta: CardData) -> void:
@@ -114,7 +114,7 @@ func _ao_perder() -> void:
 	voltar.pressed.connect(_voltar_menu)
 	_rodape.add_child(voltar)
 
-	visible = true
+	_raiz.visible = true
 
 
 func _voltar_menu() -> void:
@@ -122,17 +122,7 @@ func _voltar_menu() -> void:
 	get_tree().change_scene_to_file(CENA_MENU)
 
 
-# --- Utilitários ---
-
-func _botao_carta(carta: CardData) -> Button:
-	var b := Button.new()
-	b.custom_minimum_size = Vector2(150, 200)
-	b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	b.clip_text = true
-	b.add_theme_font_size_override("font_size", 16)
-	b.text = "[%d] %s\n\n%s" % [carta.custo, carta.nome, carta.descricao]
-	return b
-
+# --- Utilitário ---
 
 func _limpar(container: Node) -> void:
 	for filho in container.get_children():

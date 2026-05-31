@@ -29,6 +29,10 @@ var inimigos: Array[Combatant] = []
 @export var energia_maxima: int = 3
 var energia_atual: int = 0
 
+## Poderes recorrentes ativos no combate (ex: dragões invocados que atacam
+## todo turno). Cada item é um efeito aplicado no início do turno do jogador.
+var poderes_ativos: Array[Dictionary] = []
+
 
 func _ready() -> void:
 	# Escuta mortes para checar fim de combate.
@@ -41,6 +45,7 @@ func iniciar_combate(p_jogador: Combatant, p_inimigos: Array[Combatant]) -> void
 	jogador = p_jogador
 	inimigos = p_inimigos
 	estado = Estado.INICIO
+	poderes_ativos.clear()
 
 	DeckManager.iniciar_combate()
 	SignalBus.combate_iniciado.emit()
@@ -62,6 +67,10 @@ func iniciar_turno_jogador() -> void:
 	energia_atual = energia_maxima
 	SignalBus.energia_alterada.emit(energia_atual, energia_maxima)
 	jogador.limpar_bloqueio()
+
+	# Dragões invocados agem no início do turno (atacam o inimigo, etc.).
+	_aplicar_poderes()
+
 	DeckManager.comprar_mao_inicial()
 
 	SignalBus.turno_jogador_iniciado.emit()
@@ -89,6 +98,8 @@ func jogar_carta(carta: CardData, alvo: Combatant = null) -> bool:
 	# Carta de Poder fica em jogo; as demais vão para o descarte.
 	if carta.tipo != CardData.CardType.PODER:
 		DeckManager.descartar_carta(carta)
+	else:
+		_registrar_poderes_da_carta(carta)
 
 	_checar_vitoria()
 	return true
@@ -135,6 +146,26 @@ func iniciar_turno_inimigo() -> void:
 
 
 ## --- Fim de combate ---
+
+## --- Poderes recorrentes (dragões invocados) ---
+
+## Procura nos efeitos da carta entradas que registram um poder recorrente,
+## no formato { "tipo": "invocar", "efeito": { ... } }, e as ativa.
+func _registrar_poderes_da_carta(carta: CardData) -> void:
+	for ef in carta.efeitos:
+		if ef.get("tipo", "") == "invocar":
+			var recorrente: Dictionary = ef.get("efeito", {})
+			if not recorrente.is_empty():
+				poderes_ativos.append(recorrente)
+
+
+## Aplica todos os poderes ativos (chamado no início do turno do jogador).
+func _aplicar_poderes() -> void:
+	for efeito in poderes_ativos:
+		CardEffects.aplicar_efeito_recorrente(efeito, jogador, inimigos)
+	# Um poder pode ter derrotado o inimigo.
+	_checar_vitoria()
+
 
 func _ao_inimigo_morrer(_inimigo) -> void:
 	_checar_vitoria()

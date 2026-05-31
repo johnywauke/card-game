@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=2 format=3 uid="uid://drg00000050"]
+
+[ext_resource type="Script" uid="uid://bdxlpgi6w130y" path="res://Script/Resources/CardData.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"drg_avatar"
+nome = "Avatar do Dragão Ancião"
+descricao = "No início de cada turno, causa 10 de dano ao inimigo."
+tipo = 3
+raridade = 2
+alvo = 3
+custo = 3
+valor_base = 0
+fervor_ganho = 0
+fervor_custo = 0
+efeitos = [{ "tipo": "invocar", "efeito": { "tipo": "dano", "valor": 10, "alvo": "inimigo" } }]

@@ -60,7 +60,7 @@ func configurar(p_jogador: Combatant, p_inimigo: Enemy, p_maquina: CombatStateMa
 func _atualizar_tudo() -> void:
 	if jogador != null:
 		_set_barra(barra_hp_jogador, label_hp_jogador, jogador.hp_atual, jogador.hp_max)
-		label_bloqueio_jogador.text = "Bloqueio: %d" % jogador.bloqueio
+		label_bloqueio_jogador.text = _texto_bloqueio(jogador)
 		label_fervor.text = "Fervor: %d" % jogador.get_status(&"fervor")
 	if inimigo != null:
 		_set_barra(barra_hp_inimigo, label_hp_inimigo, inimigo.hp_atual, inimigo.hp_max)
@@ -79,9 +79,17 @@ func _ao_hp_alterado(alvo, hp_atual: int, hp_max: int) -> void:
 func _ao_bloqueio_alterado(alvo, _quantidade: int) -> void:
 	# Lê o valor atual direto do combatente (mais simples que somar deltas).
 	if alvo == jogador:
-		label_bloqueio_jogador.text = "Bloqueio: %d" % jogador.bloqueio
+		label_bloqueio_jogador.text = _texto_bloqueio(jogador)
 	elif alvo == inimigo:
 		label_bloqueio_inimigo.text = "Bloqueio: %d" % inimigo.bloqueio
+
+
+## Texto do bloqueio do jogador, incluindo Escamas (armadura) se houver.
+func _texto_bloqueio(c: Combatant) -> String:
+	var escamas := c.get_status(&"escamas")
+	if escamas > 0:
+		return "Bloqueio: %d  (Escamas: %d)" % [c.bloqueio, escamas]
+	return "Bloqueio: %d" % c.bloqueio
 
 
 func _ao_energia_alterada(atual: int, maximo: int) -> void:
