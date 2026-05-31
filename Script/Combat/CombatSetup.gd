@@ -4,9 +4,6 @@
 ##  - configura o jogador (Combatant) e o inimigo (Enemy)
 ##  - conecta a HUD, a mão de cartas (Hand) e a tela de fim de combate
 ##  - inicia a CombatStateMachine
-##
-## O baralho da run vive no DeckManager (cresce com as recompensas). O inimigo
-## pode ser definido no Inspector; se vazio, usa o Geleko padrão.
 extends Node
 
 ## Dados do inimigo (opcional: arraste um EnemyData no Inspector).
@@ -51,25 +48,19 @@ func _ready() -> void:
 	maquina.iniciar_combate(jogador, lista_inimigos)
 
 
-## Instancia o nó da mão (Hand.gd) dentro da camada de UI e o configura.
+## Instancia a mão (Hand.gd, um CanvasLayer) e a configura.
 func _criar_mao() -> void:
-	if hud == null:
-		return
-	var mao := Control.new()
+	var mao = load(HAND_SCRIPT).new()
 	mao.name = "Mao"
-	mao.set_script(load(HAND_SCRIPT))
-	hud.add_child(mao)
-	if mao.has_method("configurar"):
-		mao.configurar(maquina, inimigo)
+	add_child(mao)            # CanvasLayer renderiza por cima de tudo.
+	mao.configurar(maquina, inimigo)
 
 
 ## Instancia a tela de fim de combate (escondida até o combate acabar).
 func _criar_tela_fim() -> void:
 	if hud == null:
 		return
-	var fim := Control.new()
+	var fim = load(FIM_SCRIPT).new()
 	fim.name = "TelaFim"
-	fim.set_script(load(FIM_SCRIPT))
 	hud.add_child(fim)
-	if fim.has_method("configurar"):
-		fim.configurar(jogador)
+	fim.configurar(jogador)
