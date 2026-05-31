@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3 uid="uid://elitenaja0001"]
+[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3 uid="uid://elitenaja0001"]
 
 [ext_resource type="Script" path="res://Script/Resources/EnemyData.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://ckmif8pnbtnh1" path="res://Assets/Sprites/Enemies/01/4.png" id="2_sprite"]
 
 [resource]
 script = ExtResource("1_script")
@@ -9,3 +10,4 @@ nome = "Naja Sombria"
 hp_max = 35
 padrao = 0
 intencoes = [{ "tipo": "atacar_status", "valor": 6, "status": "veneno", "status_valor": 4 }, { "tipo": "atacar_multiplo", "valor": 4, "vezes": 2 }, { "tipo": "atacar_status", "valor": 5, "status": "vulneravel", "status_valor": 2 }]
+sprite = ExtResource("2_sprite")

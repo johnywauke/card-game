@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3 uid="uid://enemycogumin1"]
+[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3 uid="uid://enemycogumin1"]
 
 [ext_resource type="Script" path="res://Script/Resources/EnemyData.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://by6tk8dg2g7eo" path="res://Assets/Sprites/Enemies/01/3.png" id="2_sprite"]
 
 [resource]
 script = ExtResource("1_script")
@@ -9,3 +10,4 @@ nome = "Cogumín"
 hp_max = 18
 padrao = 0
 intencoes = [{ "tipo": "atacar", "valor": 5 }, { "tipo": "atacar_status", "valor": 4, "status": "veneno", "status_valor": 3 }]
+sprite = ExtResource("2_sprite")

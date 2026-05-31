@@ -30,6 +30,7 @@ const FIM_SCRIPT := "res://Script/Combat/CombatEndScreen.gd"
 @onready var inimigo: Enemy = $"../Inimigo"
 @onready var maquina: CombatStateMachine = $"../CombatStateMachine"
 @onready var hud: Control = $"../HUD_Root"
+@onready var inimigo_sprite: Sprite2D = $"../InimigoSprite"
 
 
 func _ready() -> void:
@@ -54,6 +55,10 @@ func _ready() -> void:
 			inimigo.nome_exibicao = dados_inimigo.nome + " (Elite)"
 		elif DeckManager.tipo_no_atual == "chefe":
 			inimigo.nome_exibicao = dados_inimigo.nome + " (Chefe)"
+
+		# Troca o sprite na cena pelo do inimigo sorteado (se tiver).
+		if inimigo_sprite != null and dados_inimigo.sprite != null:
+			inimigo_sprite.texture = dados_inimigo.sprite
 
 	# 4) Conecta a HUD (lê o HP já ajustado).
 	if hud != null and hud.has_method("configurar"):

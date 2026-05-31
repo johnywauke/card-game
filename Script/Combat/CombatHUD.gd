@@ -20,6 +20,7 @@ extends Control
 @onready var label_hp_inimigo: Label = $HUD/PainelInimigo/BarraHP/LabelHP
 @onready var label_bloqueio_inimigo: Label = $HUD/PainelInimigo/LabelBloqueio
 @onready var label_intencao: Label = $HUD/PainelInimigo/LabelIntencao
+@onready var label_nome_inimigo: Label = $HUD/PainelInimigo/NomeInimigo
 
 @onready var botao_terminar: Button = $HUD/BotaoTerminarTurno
 
@@ -65,6 +66,8 @@ func _atualizar_tudo() -> void:
 	if inimigo != null:
 		_set_barra(barra_hp_inimigo, label_hp_inimigo, inimigo.hp_atual, inimigo.hp_max)
 		label_bloqueio_inimigo.text = "Bloqueio: %d" % inimigo.bloqueio
+		if label_nome_inimigo != null:
+			label_nome_inimigo.text = inimigo.nome_exibicao
 
 
 # --- Reações aos sinais ---
