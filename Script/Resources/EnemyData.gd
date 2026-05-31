@@ -34,3 +34,40 @@ enum PadraoIA {
 
 ## --- Apresentação ---
 @export var sprite: Texture2D
+
+
+## Retorna uma lista de descrições legíveis das habilidades do inimigo,
+## para exibir no preview do mapa. Uma linha por tipo de move (sem repetir).
+func resumo_habilidades() -> Array[String]:
+	var vistos: Array[String] = []
+	var linhas: Array[String] = []
+	for move in intencoes:
+		var tipo: String = move.get("tipo", "")
+		if tipo in vistos:
+			continue
+		vistos.append(tipo)
+		linhas.append(_descrever_move(move))
+	return linhas
+
+
+## Descreve um único move em texto.
+func _descrever_move(move: Dictionary) -> String:
+	var tipo: String = move.get("tipo", "")
+	match tipo:
+		"atacar":
+			return "🗡 Ataca causando dano"
+		"atacar_multiplo":
+			return "🗡 Golpe múltiplo (%dx)" % move.get("vezes", 1)
+		"defender":
+			return "🛡 Ganha bloqueio"
+		"atacar_defender":
+			return "🗡🛡 Ataca e se defende"
+		"atacar_status":
+			return "🗡 Ataca e aplica %s" % move.get("status", "efeito")
+		"buff":
+			return "✨ Fica mais forte"
+		"defender_buff":
+			return "🛡✨ Defende e se fortalece"
+		"debuff":
+			return "☠ Enfraquece você"
+	return "?"

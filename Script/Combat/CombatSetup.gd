@@ -43,7 +43,10 @@ func _ready() -> void:
 		jogador.hp_max = DeckManager.hp_max_jogador
 		jogador.hp_atual = DeckManager.hp_jogador
 
-	# 3) Escolhe o inimigo conforme o tipo de nó do mapa.
+	# 3) Escolhe o inimigo: usa o do Inspector, ou o já definido no nó do mapa,
+	#    ou (fallback) sorteia. Assim o monstro do preview é o mesmo do combate.
+	if dados_inimigo == null:
+		dados_inimigo = DeckManager.inimigo_do_no_atual()
 	if dados_inimigo == null:
 		dados_inimigo = _sortear_inimigo()
 	if inimigo != null and dados_inimigo != null:

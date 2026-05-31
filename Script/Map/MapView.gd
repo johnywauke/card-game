@@ -8,6 +8,7 @@ extends Control
 
 const CENA_COMBATE := "res://Scenes/Combat/Combat.tscn"
 const CENA_FOGUEIRA := "res://Scenes/Map/Fogueira.tscn"
+const PREVIEW_SCRIPT := "res://Script/Map/MonsterPreview.gd"
 
 # Espaçamento visual.
 const ALTURA_ANDAR := 130
@@ -114,5 +115,16 @@ func _ao_escolher(andar: int, indice: int) -> void:
 	if tipo == "fogueira":
 		get_tree().change_scene_to_file(CENA_FOGUEIRA)
 	else:
-		# combate, elite e chefe usam a cena de combate.
-		get_tree().change_scene_to_file(CENA_COMBATE)
+		# Combate/elite/chefe: mostra o preview do monstro antes de lutar.
+		var dados := DeckManager.inimigo_do_no_atual()
+		if dados == null:
+			get_tree().change_scene_to_file(CENA_COMBATE)
+			return
+		var preview = load(PREVIEW_SCRIPT).new()
+		add_child(preview)
+		preview.mostrar(dados, tipo, _ir_para_combate)
+
+
+## Callback chamado pelo botão "Lutar" do preview.
+func _ir_para_combate() -> void:
+	get_tree().change_scene_to_file(CENA_COMBATE)

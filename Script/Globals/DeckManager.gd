@@ -90,6 +90,20 @@ const _POOL_DRAGAO := [
 ## Classe escolhida para a run atual ("espadachin" ou "dragao").
 var classe_atual: String = "espadachin"
 
+## --- Pools de inimigos por tipo de nó (usadas na geração do mapa) ---
+const _INIMIGOS_BASICOS := [
+	"res://Resources/Enemies/geleko.tres",
+	"res://Resources/Enemies/cogumin.tres",
+	"res://Resources/Enemies/vesporio.tres",
+	"res://Resources/Enemies/casco.tres",
+	"res://Resources/Enemies/espreitador.tres",
+]
+const _INIMIGOS_ELITE := [
+	"res://Resources/Enemies/brutamonte.tres",
+	"res://Resources/Enemies/naja.tres",
+]
+const _INIMIGO_CHEFE := "res://Resources/Enemies/guardiao_bronze.tres"
+
 
 ## Define o baralho da run (chamado ao iniciar uma partida).
 ## Faz cópias independentes de cada carta para evitar efeitos colaterais.
@@ -145,16 +159,18 @@ func _gerar_mapa() -> void:
 		var andar: Array = []
 		if a == total_andares - 1:
 			# Último andar: o Chefe (nó único).
-			andar.append({ "id": contador_id, "tipo": "chefe", "coluna": 1, "ligacoes": [] })
+			andar.append({ "id": contador_id, "tipo": "chefe", "coluna": 1, "ligacoes": [], "inimigo": _INIMIGO_CHEFE })
 			contador_id += 1
 		else:
 			var qtd := randi_range(2, 3)  # 2 ou 3 nós por andar.
 			for col in qtd:
+				var tipo := _sortear_tipo_no(a)
 				andar.append({
 					"id": contador_id,
-					"tipo": _sortear_tipo_no(a),
+					"tipo": tipo,
 					"coluna": col,
 					"ligacoes": [],
+					"inimigo": _sortear_inimigo_para(tipo),
 				})
 				contador_id += 1
 		mapa.append(andar)
@@ -172,6 +188,32 @@ func _gerar_mapa() -> void:
 				ligacoes.append(alvos[i])
 			ligacoes.sort()
 			no["ligacoes"] = ligacoes
+
+
+## Sorteia o caminho de um inimigo conforme o tipo de nó (na geração).
+## Fogueira não tem inimigo (retorna vazio).
+func _sortear_inimigo_para(tipo: String) -> String:
+	match tipo:
+		"elite":
+			return _INIMIGOS_ELITE.pick_random()
+		"chefe":
+			return _INIMIGO_CHEFE
+		"combate":
+			return _INIMIGOS_BASICOS.pick_random()
+		_:
+			return ""  # fogueira etc.
+
+
+## Retorna o EnemyData do nó atual (já decidido na geração do mapa).
+## Usado pelo CombatSetup. Retorna null se o nó não tiver inimigo.
+func inimigo_do_no_atual() -> EnemyData:
+	if andar_atual < 0 or andar_atual >= mapa.size():
+		return null
+	var no: Dictionary = mapa[andar_atual][no_atual]
+	var caminho: String = no.get("inimigo", "")
+	if caminho == "":
+		return null
+	return load(caminho) as EnemyData
 
 
 ## Sorteia o tipo de um nó conforme o andar (fogueira/elite ficam mais ao meio/fim).
