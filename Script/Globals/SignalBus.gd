@@ -23,6 +23,7 @@ signal mao_alterada                      ## Emite quando a mão muda (para a UI 
 signal dano_causado(alvo, quantidade: int)     ## alvo pode ser jogador ou inimigo.
 signal bloqueio_ganho(alvo, quantidade: int)
 signal hp_alterado(alvo, hp_atual: int, hp_max: int)
+signal cura_recebida(alvo, quantidade: int)    ## cura efetiva aplicada.
 signal inimigo_morreu(inimigo)
 signal jogador_morreu
 

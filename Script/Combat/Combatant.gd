@@ -72,8 +72,12 @@ func receber_dano(quantidade: int) -> int:
 func curar(quantidade: int) -> void:
 	if quantidade <= 0 or not esta_vivo():
 		return
+	var antes := hp_atual
 	hp_atual = min(hp_atual + quantidade, hp_max)
+	var curado := hp_atual - antes
 	SignalBus.hp_alterado.emit(self, hp_atual, hp_max)
+	if curado > 0:
+		SignalBus.cura_recebida.emit(self, curado)
 
 
 func _morrer() -> void:

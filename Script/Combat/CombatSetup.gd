@@ -87,6 +87,12 @@ func _ready() -> void:
 	_criar_mao()
 	_criar_tela_fim()
 
+	# 5.1) Sistema de feedback visual (números flutuantes, tremor, flash).
+	var heroi_sprite: Sprite2D = get_node_or_null("../HeroiSprite")
+	var feedback = load("res://Script/Combat/CombatFeedback.gd").new()
+	add_child(feedback)
+	feedback.configurar(jogador, inimigo, heroi_sprite, inimigo_sprite)
+
 	# 6) Inicia o combate (compra a primeira mão e dispara a UI).
 	var lista_inimigos: Array[Combatant] = [inimigo]
 	maquina.iniciar_combate(jogador, lista_inimigos)
