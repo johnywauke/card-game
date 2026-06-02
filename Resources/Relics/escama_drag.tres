@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RelicData" load_steps=2 format=3 uid="uid://relic0000005"]
+
+[ext_resource type="Script" path="res://Script/Resources/RelicData.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"escama_drag"
+nome = "Escama Ancestral"
+descricao = "Começa cada combate com 3 de Escamas."
+efeito_tipo = "escamas_inicial"
+efeito_valor = 3
+custo = 160

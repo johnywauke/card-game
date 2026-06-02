@@ -21,6 +21,9 @@ var intencao_atual: Dictionary = {}
 ## Índice usado quando o padrão é SEQUENCIAL.
 var _indice_seq: int = 0
 
+## Marca se o chefe já enfureceu (para aplicar o buff só uma vez).
+var _enfurecido: bool = false
+
 
 func _ready() -> void:
 	eh_jogador = false
@@ -41,6 +44,7 @@ func aplicar_dados(novos_dados: EnemyData) -> void:
 	nome_exibicao = dados.nome
 	hp_atual = hp_max
 	_indice_seq = 0
+	_enfurecido = false
 
 
 ## Escolhe o próximo move conforme o padrão de IA e avisa a UI.
@@ -107,3 +111,19 @@ func executar_intencao(jogador: Combatant) -> void:
 
 		_:
 			push_warning("Enemy: intenção desconhecida '%s'." % tipo)
+
+
+## Recebe dano e, se for um chefe que enfurece, checa o limiar de 50%.
+func receber_dano(quantidade: int) -> int:
+	var resultado := super(quantidade)
+	_checar_enfurecer()
+	return resultado
+
+
+## Ao cair em 50% ou menos do HP, ganha Força uma única vez (mecânica de chefe).
+func _checar_enfurecer() -> void:
+	if dados == null or not dados.enfurece or _enfurecido:
+		return
+	if hp_atual > 0 and hp_atual <= hp_max / 2.0:
+		_enfurecido = true
+		aplicar_status(&"forca", dados.enfurece_forca)

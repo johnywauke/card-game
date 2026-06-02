@@ -35,6 +35,10 @@ enum PadraoIA {
 ## --- Apresentação ---
 @export var sprite: Texture2D
 
+## Mecânica de chefe: ao cair abaixo de 50% de HP, ganha Força (uma vez).
+@export var enfurece: bool = false
+@export var enfurece_forca: int = 4
+
 
 ## Retorna uma lista de descrições legíveis das habilidades do inimigo,
 ## para exibir no preview do mapa. Uma linha por tipo de move (sem repetir).
@@ -47,6 +51,8 @@ func resumo_habilidades() -> Array[String]:
 			continue
 		vistos.append(tipo)
 		linhas.append(_descrever_move(move))
+	if enfurece:
+		linhas.append("😡 Enfurece abaixo de 50% de HP")
 	return linhas
 
 

@@ -35,6 +35,11 @@ var run_iniciada: bool = false
 var hp_jogador: int = 70
 var hp_max_jogador: int = 70
 
+## --- Ouro e Relíquias (estado da run) ---
+var ouro: int = 0
+var reliquias: Array[RelicData] = []
+var energia_max_jogador: int = 3
+
 ## --- Estado do MAPA ---
 ## O mapa é uma lista de andares; cada andar é uma lista de nós.
 ## Cada nó: { "tipo": String, "coluna": int, "ligacoes": Array[int] }
@@ -118,6 +123,79 @@ func adicionar_carta(carta: CardData) -> void:
 	baralho_mestre.append(carta.duplicar())
 
 
+## --- Ouro e Relíquias ---
+
+func ganhar_ouro(quantidade: int) -> void:
+	ouro += quantidade
+
+
+func comprar_reliquia(relic: RelicData) -> bool:
+	if relic == null or ouro < relic.custo or possui_reliquia(relic):
+		return false
+	ouro -= relic.custo
+	_adicionar_reliquia(relic)
+	return true
+
+
+func possui_reliquia(relic: RelicData) -> bool:
+	for r in reliquias:
+		if r.id == relic.id:
+			return true
+	return false
+
+
+func _adicionar_reliquia(relic: RelicData) -> void:
+	reliquias.append(relic)
+	if relic.efeito_tipo == "hp_max":
+		hp_max_jogador += relic.efeito_valor
+		hp_jogador += relic.efeito_valor
+	elif relic.efeito_tipo == "energia":
+		energia_max_jogador += relic.efeito_valor
+
+
+func bonus_reliquia(tipo: String) -> int:
+	var total := 0
+	for r in reliquias:
+		if r.efeito_tipo == tipo:
+			total += r.efeito_valor
+	return total
+
+
+## --- Eventos (cura/dano fora do combate) ---
+
+func curar_jogador(valor: int) -> void:
+	hp_jogador = min(hp_jogador + valor, hp_max_jogador)
+
+
+## Fere o jogador, mas nunca o mata fora do combate (mínimo 1 de HP).
+func ferir_jogador(valor: int) -> void:
+	hp_jogador = max(hp_jogador - valor, 1)
+
+
+## --- Melhorar carta (fogueira) ---
+
+## Devolve o baralho mestre (para listar na fogueira).
+func cartas_do_baralho() -> Array[CardData]:
+	return baralho_mestre
+
+
+## True se a carta ainda não foi melhorada.
+func pode_melhorar(carta: CardData) -> bool:
+	return not carta.nome.ends_with("+")
+
+
+## Melhora a carta no índice dado: +valor_base e marca o nome com "+".
+func melhorar_carta(indice: int) -> void:
+	if indice < 0 or indice >= baralho_mestre.size():
+		return
+	var c: CardData = baralho_mestre[indice]
+	if c.nome.ends_with("+"):
+		return
+	var bonus: int = max(3, int(round(c.valor_base * 0.5)))
+	c.valor_base += bonus
+	c.nome += "+"
+
+
 ## Inicia uma nova run com a classe escolhida ("espadachin" ou "dragao").
 ## Monta o baralho inicial correspondente e reseta o HP.
 func iniciar_run(classe: String = "espadachin") -> void:
@@ -132,6 +210,9 @@ func iniciar_run(classe: String = "espadachin") -> void:
 	definir_baralho(inicial)
 	hp_max_jogador = 70
 	hp_jogador = 70
+	ouro = 0
+	reliquias = []
+	energia_max_jogador = 3
 	run_iniciada = true
 	_gerar_mapa()
 
@@ -220,10 +301,14 @@ func inimigo_do_no_atual() -> EnemyData:
 func _sortear_tipo_no(andar: int) -> String:
 	# Andares iniciais: mais combate. Depois aparecem elite e fogueira.
 	var r := randf()
-	if andar >= 2 and r < 0.20:
+	if andar >= 2 and r < 0.16:
 		return "elite"
-	elif andar >= 1 and r < 0.35:
+	elif andar >= 1 and r < 0.30:
 		return "fogueira"
+	elif andar >= 1 and r < 0.44:
+		return "loja"
+	elif andar >= 1 and r < 0.56:
+		return "evento"
 	return "combate"
 
 

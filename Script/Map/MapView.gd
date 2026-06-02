@@ -8,7 +8,10 @@ extends Control
 
 const CENA_COMBATE := "res://Scenes/Combat/Combat.tscn"
 const CENA_FOGUEIRA := "res://Scenes/Map/Fogueira.tscn"
+const CENA_LOJA := "res://Scenes/Map/Loja.tscn"
+const CENA_EVENTO := "res://Scenes/Map/Evento.tscn"
 const PREVIEW_SCRIPT := "res://Script/Map/MonsterPreview.gd"
+const LINHAS_SCRIPT := "res://Script/Map/MapConnections.gd"
 
 # Espaçamento visual.
 const ALTURA_ANDAR := 130
@@ -20,6 +23,7 @@ const MARGEM_TOPO := 80
 
 func _ready() -> void:
 	_desenhar_mapa()
+	_construir_barra_topo()
 
 
 func _desenhar_mapa() -> void:
@@ -33,26 +37,50 @@ func _desenhar_mapa() -> void:
 	# Índices dos nós que o jogador pode escolher agora.
 	var disponiveis := DeckManager.nos_disponiveis()
 
-	# O mapa é desenhado de baixo (andar 0) para cima (chefe no topo),
-	# mas como é um Control, desenhamos de cima pra baixo invertendo o índice.
 	var total := mapa.size()
+
+	# 1) Desenha as linhas de ligação ATRÁS dos botões.
+	var linhas := []
+	for a in total - 1:
+		var andar_a: Array = mapa[a]
+		for i in andar_a.size():
+			var no_a: Dictionary = andar_a[i]
+			for j in no_a.get("ligacoes", []):
+				linhas.append([_centro_no(a, i), _centro_no(a + 1, j)])
+	var desenho = load(LINHAS_SCRIPT).new()
+	desenho.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	desenho.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_camada.add_child(desenho)
+	desenho.definir(linhas)
+
+	# 2) Desenha os botões dos nós por cima.
 	for a in total:
 		var andar: Array = mapa[a]
-		var y := MARGEM_TOPO + (total - 1 - a) * ALTURA_ANDAR
 		for i in andar.size():
 			var no: Dictionary = andar[i]
 			var botao := _criar_botao_no(no)
-			# Posição X centralizada conforme a quantidade de nós no andar.
-			var largura_total := andar.size() * LARGURA_COLUNA
-			var x := 600 - largura_total / 2 + i * LARGURA_COLUNA
-			botao.position = Vector2(x, y)
+			botao.position = _posicao_no(a, i)
 
-			# Clicável só se estiver na lista de disponíveis.
 			var pode := _no_esta_disponivel(no, disponiveis)
 			botao.disabled = not pode
 			if pode:
 				botao.pressed.connect(_ao_escolher.bind(a, i))
 			_camada.add_child(botao)
+
+
+## Posição (canto superior esquerdo) do botão de um nó.
+func _posicao_no(a: int, i: int) -> Vector2:
+	var total := DeckManager.mapa.size()
+	var andar: Array = DeckManager.mapa[a]
+	var y := MARGEM_TOPO + (total - 1 - a) * ALTURA_ANDAR
+	var largura_total := andar.size() * LARGURA_COLUNA
+	var x := 600 - largura_total / 2 + i * LARGURA_COLUNA
+	return Vector2(x, y)
+
+
+## Centro do nó (para ligar as linhas). Botão tem 180x80.
+func _centro_no(a: int, i: int) -> Vector2:
+	return _posicao_no(a, i) + Vector2(90, 40)
 
 
 ## Verifica se um nó está entre os disponíveis (compara pelo id único).
@@ -83,6 +111,12 @@ func _criar_botao_no(no: Dictionary) -> Button:
 		"fogueira":
 			texto = "🔥 Fogueira"
 			cor = Color(0.70, 0.45, 0.15)
+		"loja":
+			texto = "🏪 Loja"
+			cor = Color(0.20, 0.50, 0.45)
+		"evento":
+			texto = "❓ Evento"
+			cor = Color(0.35, 0.35, 0.55)
 		"chefe":
 			texto = "👑 Chefe"
 			cor = Color(0.65, 0.55, 0.15)
@@ -114,6 +148,10 @@ func _ao_escolher(andar: int, indice: int) -> void:
 	var tipo := DeckManager.tipo_no_atual
 	if tipo == "fogueira":
 		get_tree().change_scene_to_file(CENA_FOGUEIRA)
+	elif tipo == "loja":
+		get_tree().change_scene_to_file(CENA_LOJA)
+	elif tipo == "evento":
+		get_tree().change_scene_to_file(CENA_EVENTO)
 	else:
 		# Combate/elite/chefe: mostra o preview do monstro antes de lutar.
 		var dados := DeckManager.inimigo_do_no_atual()
@@ -128,3 +166,24 @@ func _ao_escolher(andar: int, indice: int) -> void:
 ## Callback chamado pelo botão "Lutar" do preview.
 func _ir_para_combate() -> void:
 	get_tree().change_scene_to_file(CENA_COMBATE)
+
+
+## Barra fixa no topo do mapa mostrando HP e ouro da run.
+func _construir_barra_topo() -> void:
+	var barra := HBoxContainer.new()
+	barra.add_theme_constant_override("separation", 24)
+	barra.position = Vector2(20, 16)
+	barra.z_index = 100
+	add_child(barra)
+
+	var hp := Label.new()
+	hp.text = "❤ %d/%d" % [DeckManager.hp_jogador, DeckManager.hp_max_jogador]
+	hp.add_theme_font_size_override("font_size", 24)
+	hp.add_theme_color_override("font_color", Color(0.9, 0.4, 0.4))
+	barra.add_child(hp)
+
+	var ouro := Label.new()
+	ouro.text = "💰 %d" % DeckManager.ouro
+	ouro.add_theme_font_size_override("font_size", 24)
+	ouro.add_theme_color_override("font_color", Color(1, 0.85, 0.3))
+	barra.add_child(ouro)

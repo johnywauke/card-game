@@ -42,6 +42,22 @@ func _ready() -> void:
 	if jogador != null:
 		jogador.hp_max = DeckManager.hp_max_jogador
 		jogador.hp_atual = DeckManager.hp_jogador
+		jogador.eh_jogador = true
+		var f := DeckManager.bonus_reliquia("forca_inicial")
+		var d := DeckManager.bonus_reliquia("destreza_inicial")
+		var e := DeckManager.bonus_reliquia("escamas_inicial")
+		var b := DeckManager.bonus_reliquia("bloqueio_inicial")
+		if f > 0:
+			jogador.aplicar_status(&"forca", f)
+		if d > 0:
+			jogador.aplicar_status(&"destreza", d)
+		if e > 0:
+			jogador.aplicar_status(&"escamas", e)
+		if b > 0:
+			jogador.ganhar_bloqueio(b)
+
+	if maquina != null:
+		maquina.energia_maxima = DeckManager.energia_max_jogador
 
 	# 3) Escolhe o inimigo: usa o do Inspector, ou o já definido no nó do mapa,
 	#    ou (fallback) sorteia. Assim o monstro do preview é o mesmo do combate.

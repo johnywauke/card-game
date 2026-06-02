@@ -70,6 +70,20 @@ func _ao_vencer() -> void:
 	if jogador != null:
 		DeckManager.hp_jogador = jogador.hp_atual
 
+	var cura := DeckManager.bonus_reliquia("cura_combate")
+	if cura > 0:
+		DeckManager.hp_jogador = min(DeckManager.hp_jogador + cura, DeckManager.hp_max_jogador)
+
+	var ouro_ganho := 20
+	match DeckManager.tipo_no_atual:
+		"elite":
+			ouro_ganho = 45
+		"chefe":
+			ouro_ganho = 100
+		_:
+			ouro_ganho = randi_range(15, 28)
+	DeckManager.ganhar_ouro(ouro_ganho)
+
 	# Venceu o Chefe? Fim da run (vitória final).
 	if DeckManager.venceu_chefe():
 		_titulo.text = "Você venceu a Torre! 🏆"

@@ -42,6 +42,7 @@ func _ready() -> void:
 	SignalBus.turno_inimigo_iniciado.connect(_ao_turno_inimigo)
 
 	botao_terminar.pressed.connect(_ao_clicar_terminar)
+	_construir_extras()
 
 
 ## Chamado por quem monta o combate, passando as referências prontas.
@@ -68,6 +69,7 @@ func _atualizar_tudo() -> void:
 		label_bloqueio_inimigo.text = "Bloqueio: %d" % inimigo.bloqueio
 		if label_nome_inimigo != null:
 			label_nome_inimigo.text = inimigo.nome_exibicao
+	_atualizar_extras()
 
 
 # --- Reações aos sinais ---
@@ -162,3 +164,64 @@ func _set_barra(barra: ProgressBar, label: Label, atual: int, maximo: int) -> vo
 	barra.max_value = maximo
 	barra.value = atual
 	label.text = "%d/%d" % [atual, maximo]
+
+
+# --- Indicador de Ouro e Barra de Relíquias (criados por código) ---
+
+var _label_ouro: Label
+var _caixa_reliquias: HBoxContainer
+
+
+func _construir_extras() -> void:
+	var topo := HBoxContainer.new()
+	topo.add_theme_constant_override("separation", 12)
+	topo.position = Vector2(20, 12)
+	add_child(topo)
+
+	_label_ouro = Label.new()
+	_label_ouro.add_theme_font_size_override("font_size", 22)
+	_label_ouro.add_theme_color_override("font_color", Color(1, 0.85, 0.3))
+	topo.add_child(_label_ouro)
+
+	_caixa_reliquias = HBoxContainer.new()
+	_caixa_reliquias.add_theme_constant_override("separation", 6)
+	topo.add_child(_caixa_reliquias)
+
+
+func _atualizar_extras() -> void:
+	if _label_ouro != null:
+		_label_ouro.text = "💰 %d" % DeckManager.ouro
+	if _caixa_reliquias != null:
+		for f in _caixa_reliquias.get_children():
+			f.queue_free()
+		for r in DeckManager.reliquias:
+			_caixa_reliquias.add_child(_pilula_reliquia(r))
+
+
+## Cria uma "pílula" visual para uma relíquia (abreviação + tooltip completo).
+func _pilula_reliquia(r: RelicData) -> Control:
+	var painel := PanelContainer.new()
+	painel.tooltip_text = "%s\n%s" % [r.nome, r.descricao]
+	var st := StyleBoxFlat.new()
+	st.bg_color = Color(0.30, 0.25, 0.12, 0.95)
+	st.set_corner_radius_all(6)
+	st.set_border_width_all(2)
+	st.border_color = Color(0.8, 0.65, 0.25)
+	st.set_content_margin_all(4)
+	painel.add_theme_stylebox_override("panel", st)
+
+	var l := Label.new()
+	l.text = _abreviar(r.nome)
+	l.add_theme_font_size_override("font_size", 14)
+	l.add_theme_color_override("font_color", Color(1, 0.9, 0.6))
+	painel.add_child(l)
+	return painel
+
+
+## Abrevia o nome pelas iniciais (ex: "Coração Vital" -> "CV").
+func _abreviar(nome: String) -> String:
+	var ini := ""
+	for palavra in nome.split(" "):
+		if palavra.length() > 0:
+			ini += palavra.substr(0, 1).to_upper()
+	return ini

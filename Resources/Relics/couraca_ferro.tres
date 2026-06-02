@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RelicData" load_steps=2 format=3 uid="uid://relic0000003"]
+
+[ext_resource type="Script" path="res://Script/Resources/RelicData.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"couraca_ferro"
+nome = "Couraça de Ferro"
+descricao = "Começa cada combate com 2 de Destreza."
+efeito_tipo = "destreza_inicial"
+efeito_valor = 2
+custo = 150

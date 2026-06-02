@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RelicData" load_steps=2 format=3 uid="uid://relic0000007"]
+
+[ext_resource type="Script" path="res://Script/Resources/RelicData.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"nucleo_energia"
+nome = "Núcleo de Energia"
+descricao = "Aumenta a energia máxima em 1 por turno."
+efeito_tipo = "energia"
+efeito_valor = 1
+custo = 250

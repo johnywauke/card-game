@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RelicData" load_steps=2 format=3 uid="uid://relic0000006"]
+
+[ext_resource type="Script" path="res://Script/Resources/RelicData.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"amuleto_cura"
+nome = "Amuleto da Cura"
+descricao = "Cura 6 de vida ao vencer cada combate."
+efeito_tipo = "cura_combate"
+efeito_valor = 6
+custo = 110
