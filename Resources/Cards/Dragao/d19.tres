@@ -6,12 +6,12 @@
 script = ExtResource("1_script")
 id = &"drg_garras"
 nome = "Garras Dilacerantes"
-descricao = "Causa 4 de dano duas vezes."
+descricao = "Causa 3 de dano duas vezes."
 tipo = 0
 raridade = 0
 alvo = 0
 custo = 1
-valor_base = 4
+valor_base = 3
 fervor_ganho = 0
 fervor_custo = 0
-efeitos = [{ "tipo": "dano", "valor": 4, "alvo": "inimigo" }]
+efeitos = [{ "tipo": "dano", "valor": 3, "alvo": "inimigo" }]

@@ -1,29 +1,42 @@
 ## MainMenu.gd
-## Controla o menu inicial: Jogar, Opções e Sair.
-## Detecta se existe um save local para decidir entre "Continuar" e "Novo Jogo".
+## Controla o menu inicial: Jogar/Continuar, Opções e Sair.
+## Se houver um save de run, o botão principal vira "Continuar" e um botão
+## extra "Novo Jogo" é criado. O save é gerido pelo DeckManager (fonte única).
 extends Control
-
-## Caminho do arquivo de save local. "user://" aponta para uma pasta segura
-## do sistema (no Windows: %APPDATA%/Godot/app_userdata/card/).
-const CAMINHO_SAVE: String = "user://savegame.json"
 
 ## Cena de seleção de classe (abre ao começar um novo jogo).
 const CENA_SELECAO_CLASSE: String = "res://Scenes/UI/ClassSelect.tscn"
+## Mapa da run (abre ao continuar uma run salva).
+const CENA_MAPA: String = "res://Scenes/Map/Map.tscn"
 
 @onready var botao_jogar: Button = $VBoxContainer/BotaoJogar
 @onready var botao_opcoes: Button = $VBoxContainer/BotaoOpcoes
 @onready var botao_sair: Button = $VBoxContainer/BotaoSair
 
+## True quando o botão principal está no modo "Continuar".
+var _modo_continuar: bool = false
+
 
 func _ready() -> void:
-	botao_jogar.text = "Novo Jogo"
+	if DeckManager.tem_save():
+		# Há uma run salva: botão principal continua; adiciona "Novo Jogo".
+		_modo_continuar = true
+		botao_jogar.text = "Continuar"
+		_criar_botao_novo_jogo()
+	else:
+		_modo_continuar = false
+		botao_jogar.text = "Novo Jogo"
 
 
-## --- Sinais dos botões (conecte cada pressed() a estas funções no editor) ---
+## --- Sinais dos botões ---
 
 func _on_botao_jogar_pressed() -> void:
-	# Vai para a seleção de classe, que inicia a run com o baralho escolhido.
-	get_tree().change_scene_to_file(CENA_SELECAO_CLASSE)
+	if _modo_continuar and DeckManager.carregar_run():
+		# Retoma a run salva direto no mapa.
+		get_tree().change_scene_to_file(CENA_MAPA)
+	else:
+		# Sem save (ou falha ao carregar): começa um jogo novo.
+		get_tree().change_scene_to_file(CENA_SELECAO_CLASSE)
 
 
 func _on_botao_opcoes_pressed() -> void:
@@ -34,35 +47,24 @@ func _on_botao_sair_pressed() -> void:
 	get_tree().quit()
 
 
-## --- Save local (utilitários) ---
+## --- Novo Jogo (quando há save) ---
 
-## Verifica se existe um arquivo de save.
-func _existe_save() -> bool:
-	return FileAccess.file_exists(CAMINHO_SAVE)
+## Cria, por código, um botão "Novo Jogo" logo abaixo do "Continuar".
+## Começar um jogo novo só sobrescreve o save quando a classe é escolhida
+## (DeckManager.iniciar_run grava o novo checkpoint), então o save antigo
+## permanece intacto se o jogador desistir na tela de seleção.
+func _criar_botao_novo_jogo() -> void:
+	var novo := Button.new()
+	novo.text = "Novo Jogo"
+	# Copia o tamanho/fonte do botão principal para manter o visual coeso.
+	novo.custom_minimum_size = botao_jogar.custom_minimum_size
+	var fonte := botao_jogar.get_theme_font_size("font_size")
+	if fonte > 0:
+		novo.add_theme_font_size_override("font_size", fonte)
+	novo.pressed.connect(_ao_novo_jogo)
+	botao_jogar.get_parent().add_child(novo)
+	botao_jogar.get_parent().move_child(novo, botao_jogar.get_index() + 1)
 
 
-## Salva um dicionário de dados no arquivo local (JSON).
-## Chame de outras partes do jogo: ex. salvar_jogo({"andar": 2, "hp": 50}).
-func salvar_jogo(dados: Dictionary) -> void:
-	var arquivo := FileAccess.open(CAMINHO_SAVE, FileAccess.WRITE)
-	if arquivo == null:
-		push_error("Não foi possível abrir o save para escrita.")
-		return
-	arquivo.store_string(JSON.stringify(dados, "\t"))
-	arquivo.close()
-
-
-## Carrega os dados do save. Retorna um dicionário vazio se não houver save
-## ou se o arquivo estiver corrompido.
-func carregar_jogo() -> Dictionary:
-	if not _existe_save():
-		return {}
-	var arquivo := FileAccess.open(CAMINHO_SAVE, FileAccess.READ)
-	if arquivo == null:
-		return {}
-	var texto := arquivo.get_as_text()
-	arquivo.close()
-	var resultado = JSON.parse_string(texto)
-	if resultado is Dictionary:
-		return resultado
-	return {}
+func _ao_novo_jogo() -> void:
+	get_tree().change_scene_to_file(CENA_SELECAO_CLASSE)

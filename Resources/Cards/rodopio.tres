@@ -6,12 +6,12 @@
 script = ExtResource("1_script")
 id = &"rodopio"
 nome = "Rodopio"
-descricao = "Causa 9 de dano a todos os inimigos."
+descricao = "Causa 8 de dano a todos os inimigos."
 tipo = 0
-raridade = 1
+raridade = 0
 alvo = 1
-custo = 2
-valor_base = 9
+custo = 1
+valor_base = 8
 fervor_ganho = 0
 fervor_custo = 0
 efeitos = []

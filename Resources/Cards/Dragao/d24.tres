@@ -6,12 +6,12 @@
 script = ExtResource("1_script")
 id = &"drg_explosao"
 nome = "Explosão Ígnea"
-descricao = "Causa 22 de dano."
+descricao = "Causa 28 de dano."
 tipo = 0
 raridade = 2
 alvo = 0
 custo = 3
-valor_base = 22
+valor_base = 28
 fervor_ganho = 0
 fervor_custo = 0
 efeitos = []

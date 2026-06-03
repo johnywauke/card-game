@@ -7,7 +7,7 @@
 script = ExtResource("1_script")
 id = &"naja"
 nome = "Naja Sombria"
-hp_max = 35
+hp_max = 45
 padrao = 0
-intencoes = [{ "tipo": "atacar_status", "valor": 6, "status": "veneno", "status_valor": 4 }, { "tipo": "atacar_multiplo", "valor": 4, "vezes": 2 }, { "tipo": "atacar_status", "valor": 5, "status": "vulneravel", "status_valor": 2 }]
+intencoes = [{ "tipo": "atacar_status", "valor": 7, "status": "veneno", "status_valor": 5 }, { "tipo": "atacar_multiplo", "valor": 5, "vezes": 2 }, { "tipo": "atacar_status", "valor": 6, "status": "vulneravel", "status_valor": 3 }]
 sprite = ExtResource("2_sprite")

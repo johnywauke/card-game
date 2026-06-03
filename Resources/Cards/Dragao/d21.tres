@@ -6,12 +6,12 @@
 script = ExtResource("1_script")
 id = &"drg_tempestade"
 nome = "Tempestade de Fogo"
-descricao = "Causa 10 de dano a todos os inimigos."
+descricao = "Causa 12 de dano a todos os inimigos."
 tipo = 0
-raridade = 2
+raridade = 1
 alvo = 1
 custo = 2
-valor_base = 10
+valor_base = 12
 fervor_ganho = 0
 fervor_custo = 0
 efeitos = []

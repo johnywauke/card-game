@@ -7,7 +7,7 @@
 script = ExtResource("1_script")
 id = &"cogumin"
 nome = "Cogumín"
-hp_max = 18
+hp_max = 20
 padrao = 0
-intencoes = [{ "tipo": "atacar", "valor": 5 }, { "tipo": "atacar_status", "valor": 4, "status": "veneno", "status_valor": 3 }]
+intencoes = [{ "tipo": "atacar", "valor": 6 }, { "tipo": "atacar_status", "valor": 5, "status": "veneno", "status_valor": 4 }]
 sprite = ExtResource("2_sprite")

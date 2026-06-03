@@ -78,22 +78,52 @@ const _POOL_ESPADACHIN := [
 	"res://Resources/Cards/rodopio.tres",
 	"res://Resources/Cards/decapitar.tres",
 ]
-# Para o dragão, sorteamos de quase todo o conjunto (exceto as do baralho base).
+# Pool de recompensas do Dragão: curado para dar VARIEDADE e tiers claros.
+# Mistura ataques, defesa, escamas, status, força/destreza, cura e invocações.
+# A raridade de cada carta controla a frequência (ver sortear_recompensas).
 const _POOL_DRAGAO := [
-	"res://Resources/Cards/Dragao/d04.tres", "res://Resources/Cards/Dragao/d06.tres",
-	"res://Resources/Cards/Dragao/d09.tres", "res://Resources/Cards/Dragao/d10.tres",
-	"res://Resources/Cards/Dragao/d12.tres", "res://Resources/Cards/Dragao/d18.tres",
-	"res://Resources/Cards/Dragao/d21.tres", "res://Resources/Cards/Dragao/d22.tres",
-	"res://Resources/Cards/Dragao/d24.tres", "res://Resources/Cards/Dragao/d27.tres",
-	"res://Resources/Cards/Dragao/d29.tres", "res://Resources/Cards/Dragao/d30.tres",
-	"res://Resources/Cards/Dragao/d32.tres", "res://Resources/Cards/Dragao/d33.tres",
-	"res://Resources/Cards/Dragao/d36.tres", "res://Resources/Cards/Dragao/d37.tres",
-	"res://Resources/Cards/Dragao/d41.tres", "res://Resources/Cards/Dragao/d43.tres",
-	"res://Resources/Cards/Dragao/d48.tres", "res://Resources/Cards/Dragao/d50.tres",
+	# --- Comuns (preenchimento confiável) ---
+	"res://Resources/Cards/Dragao/d22.tres", # Mordida Profunda (12 dano)
+	"res://Resources/Cards/Dragao/d19.tres", # Garras Dilacerantes (3x2)
+	"res://Resources/Cards/Dragao/d44.tres", # Brado de Guerra (+1 Força, 6 bloq)
+	"res://Resources/Cards/Dragao/d47.tres", # Olhar Aterrorizante (3 Vulnerável)
+	"res://Resources/Cards/Dragao/d45.tres", # Bater de Asas (compra 2)
+	# --- Incomuns (sinergias e riders) ---
+	"res://Resources/Cards/Dragao/d46.tres", # Sangue de Dragão (cura 8)
+	"res://Resources/Cards/Dragao/d16.tres", # Chamas Persistentes (dano + queimadura)
+	"res://Resources/Cards/Dragao/d17.tres", # Cuspe Ácido (dano + Vulnerável)
+	"res://Resources/Cards/Dragao/d20.tres", # Cauda Esmagadora (dano + Fraqueza)
+	"res://Resources/Cards/Dragao/d18.tres", # Investida do Dragão (16 dano)
+	"res://Resources/Cards/Dragao/d04.tres", # Muralha de Escamas (14 bloq)
+	"res://Resources/Cards/Dragao/d23.tres", # Voo Rasante (dano + bloq)
+	"res://Resources/Cards/Dragao/d06.tres", # Reforço Ósseo (+3 Escamas)
+	"res://Resources/Cards/Dragao/d37.tres", # Fúria Dracônica (+2 Força)
+	"res://Resources/Cards/Dragao/d39.tres", # Sangue Ancestral (+1 Força/+1 Destreza)
+	"res://Resources/Cards/Dragao/d40.tres", # Concentração Reptiliana (+2 Destreza)
+	"res://Resources/Cards/Dragao/d10.tres", # Escamas Regenerativas (Escamas + cura)
+	"res://Resources/Cards/Dragao/d27.tres", # Invocar Dragãozinho (5 dano x3)
+	"res://Resources/Cards/Dragao/d32.tres", # Servo Flamejante (6 dano x3)
+	"res://Resources/Cards/Dragao/d30.tres", # Guardião Alado (5 bloq x3)
+	"res://Resources/Cards/Dragao/d35.tres", # Espírito do Dragão (cura 3 x3)
+	# --- Raras (definem a build) ---
+	"res://Resources/Cards/Dragao/d24.tres", # Explosão Ígnea (28 dano)
+	"res://Resources/Cards/Dragao/d09.tres", # Casulo de Cristal (20 bloq)
+	"res://Resources/Cards/Dragao/d12.tres", # Égide do Ancião (14 bloq + 3 Escamas)
+	"res://Resources/Cards/Dragao/d41.tres", # Pacto Ancestral (+2 Força/+2 Destreza)
+	"res://Resources/Cards/Dragao/d48.tres", # Ira do Cataclismo (18 a todos)
+	"res://Resources/Cards/Dragao/d49.tres", # Renascer das Cinzas (cura 12 + Escamas)
+	"res://Resources/Cards/Dragao/d29.tres", # Ninho de Dragões (4 a todos x3)
+	"res://Resources/Cards/Dragao/d50.tres", # Avatar do Dragão Ancião (10 dano x3)
 ]
 
 ## Classe escolhida para a run atual ("espadachin" ou "dragao").
 var classe_atual: String = "espadachin"
+
+## Caminho do save local da run. "user://" é uma pasta segura do sistema
+## (no Windows: %APPDATA%/Godot/app_userdata/card/).
+const CAMINHO_SAVE: String = "user://savegame.json"
+## Versão do formato de save (para migração futura, se mudarmos os campos).
+const VERSAO_SAVE: int = 1
 
 ## --- Pools de inimigos por tipo de nó (usadas na geração do mapa) ---
 const _INIMIGOS_BASICOS := [
@@ -215,14 +245,17 @@ func iniciar_run(classe: String = "espadachin") -> void:
 	energia_max_jogador = 3
 	run_iniciada = true
 	_gerar_mapa()
+	salvar_run()  # checkpoint inicial: a run já é retomável de cara.
 
 
-## Encerra a run atual (chamado no game over).
+## Encerra a run atual (chamado no game over ou na vitória final).
+## Apaga o save para que o menu volte a oferecer "Novo Jogo".
 func encerrar_run() -> void:
 	run_iniciada = false
 	mapa = []
 	andar_atual = -1
 	no_atual = -1
+	apagar_save()
 
 
 ## --- Geração e navegação do MAPA ---
@@ -341,16 +374,59 @@ func venceu_chefe() -> bool:
 	return andar_atual == mapa.size() - 1 and mapa.size() > 0
 
 
-## Sorteia até n cartas distintas do pool de recompensas da classe atual.
+## Sorteia até n cartas distintas de recompensa, com PESO por raridade.
+## Comuns aparecem com frequência; raras são um "achado". A chance de rara
+## cresce conforme você avança nos andares e é maior em combates de Elite.
 func sortear_recompensas(n: int = 3) -> Array[CardData]:
-	var pool: Array = (_POOL_DRAGAO if classe_atual == "dragao" else _POOL_ESPADACHIN).duplicate()
-	pool.shuffle()
-	var resultado: Array[CardData] = []
-	for i in min(n, pool.size()):
-		var carta := load(pool[i]) as CardData
+	var caminhos: Array = (_POOL_DRAGAO if classe_atual == "dragao" else _POOL_ESPADACHIN)
+	# Agrupa as cartas por raridade (0=Comum, 1=Incomum, 2=Rara).
+	var por_raridade := { 0: [], 1: [], 2: [] }
+	for caminho in caminhos:
+		var carta := load(caminho) as CardData
 		if carta != null:
-			resultado.append(carta)
+			por_raridade[carta.raridade].append(carta)
+
+	# Pesos base; a chance de rara melhora com o progresso e em Elites.
+	var progresso: int = maxi(andar_atual, 0)
+	var peso_rara: int = 6 + progresso * 2
+	if tipo_no_atual == "elite":
+		peso_rara += 15
+	var pesos := { 0: 66, 1: 28, 2: peso_rara }
+
+	var resultado: Array[CardData] = []
+	var ids_usados := {}
+	for i in n:
+		var carta := _sortear_carta_ponderada(por_raridade, pesos, ids_usados)
+		if carta == null:
+			break
+		resultado.append(carta)
+		ids_usados[carta.id] = true
 	return resultado
+
+
+## Escolhe uma carta: sorteia a raridade pelos pesos e, dentro dela, uma carta
+## ainda não escolhida. Se a raridade sorteada estiver esgotada, usa as outras.
+func _sortear_carta_ponderada(por_raridade: Dictionary, pesos: Dictionary, ids_usados: Dictionary) -> CardData:
+	var ordem := [_sortear_raridade(pesos), 0, 1, 2]  # sorteada primeiro; demais de reserva.
+	for raridade in ordem:
+		var disponiveis: Array = []
+		for carta in por_raridade.get(raridade, []):
+			if not ids_usados.has(carta.id):
+				disponiveis.append(carta)
+		if not disponiveis.is_empty():
+			return disponiveis[randi() % disponiveis.size()]
+	return null
+
+
+## Sorteia uma raridade (0/1/2) conforme os pesos informados.
+func _sortear_raridade(pesos: Dictionary) -> int:
+	var total: int = pesos[0] + pesos[1] + pesos[2]
+	var r := randi() % maxi(total, 1)
+	if r < pesos[0]:
+		return 0
+	if r < pesos[0] + pesos[1]:
+		return 1
+	return 2
 
 
 ## Prepara as pilhas para um novo combate.
@@ -439,3 +515,144 @@ func qtd_mao() -> int:
 
 func qtd_descarte() -> int:
 	return descarte.size()
+
+
+## ============================================================================
+## SAVE / LOAD DA RUN
+## A run inteira (baralho, HP, ouro, relíquias, mapa e posição) é persistida
+## em disco como JSON. O save é um CHECKPOINT entre atividades: gravamos sempre
+## que o jogador volta ao mapa, então fechar o jogo e voltar retoma de onde
+## parou. As pilhas de combate (monte/mão/descarte) NÃO são salvas: o combate
+## sempre recomeça do baralho mestre.
+## ============================================================================
+
+## True se existe um save de run para retomar.
+func tem_save() -> bool:
+	return FileAccess.file_exists(CAMINHO_SAVE)
+
+
+## Apaga o save (no game over, vitória final, ou save corrompido).
+func apagar_save() -> void:
+	if FileAccess.file_exists(CAMINHO_SAVE):
+		DirAccess.remove_absolute(CAMINHO_SAVE)
+
+
+## Grava o estado atual da run no arquivo de save (JSON).
+func salvar_run() -> void:
+	if not run_iniciada:
+		return
+	var dados := {
+		"versao": VERSAO_SAVE,
+		"classe_atual": classe_atual,
+		"hp_jogador": hp_jogador,
+		"hp_max_jogador": hp_max_jogador,
+		"ouro": ouro,
+		"energia_max_jogador": energia_max_jogador,
+		"andar_atual": andar_atual,
+		"no_atual": no_atual,
+		"tipo_no_atual": tipo_no_atual,
+		"baralho": _serializar_baralho(),
+		"reliquias": _serializar_reliquias(),
+		"mapa": mapa,  # já é uma estrutura de Arrays/Dicionários simples.
+	}
+	var arquivo := FileAccess.open(CAMINHO_SAVE, FileAccess.WRITE)
+	if arquivo == null:
+		push_error("DeckManager: não foi possível abrir o save para escrita.")
+		return
+	arquivo.store_string(JSON.stringify(dados, "\t"))
+	arquivo.close()
+
+
+## Carrega a run do save e reconstrói o estado. Retorna true se conseguiu.
+func carregar_run() -> bool:
+	if not tem_save():
+		return false
+	var arquivo := FileAccess.open(CAMINHO_SAVE, FileAccess.READ)
+	if arquivo == null:
+		return false
+	var texto := arquivo.get_as_text()
+	arquivo.close()
+
+	var dados = JSON.parse_string(texto)
+	if not (dados is Dictionary):
+		push_warning("DeckManager: save corrompido; ignorando.")
+		apagar_save()
+		return false
+
+	classe_atual = dados.get("classe_atual", "espadachin")
+	hp_jogador = int(dados.get("hp_jogador", 70))
+	hp_max_jogador = int(dados.get("hp_max_jogador", 70))
+	ouro = int(dados.get("ouro", 0))
+	energia_max_jogador = int(dados.get("energia_max_jogador", 3))
+	andar_atual = int(dados.get("andar_atual", -1))
+	no_atual = int(dados.get("no_atual", -1))
+	tipo_no_atual = dados.get("tipo_no_atual", "combate")
+	_desserializar_baralho(dados.get("baralho", []))
+	_desserializar_reliquias(dados.get("reliquias", []))
+	mapa = _desserializar_mapa(dados.get("mapa", []))
+
+	# Limpa qualquer pilha de combate antiga; o combate recomeça do baralho.
+	monte_compra.clear()
+	mao.clear()
+	descarte.clear()
+
+	run_iniciada = true
+	return true
+
+
+## --- Serialização auxiliar ---
+
+func _serializar_baralho() -> Array:
+	var lista: Array = []
+	for c in baralho_mestre:
+		lista.append(c.to_dict())
+	return lista
+
+
+func _desserializar_baralho(lista) -> void:
+	baralho_mestre.clear()
+	for d in lista:
+		if d is Dictionary:
+			baralho_mestre.append(CardData.from_dict(d))
+
+
+## Relíquias não são modificadas durante a run, então basta salvar o caminho
+## do .tres e recarregar. (Cai fora silenciosamente se o caminho não existir.)
+func _serializar_reliquias() -> Array:
+	var lista: Array = []
+	for r in reliquias:
+		if r != null and r.resource_path != "":
+			lista.append(r.resource_path)
+	return lista
+
+
+func _desserializar_reliquias(lista) -> void:
+	reliquias.clear()
+	for caminho in lista:
+		if typeof(caminho) == TYPE_STRING and ResourceLoader.exists(caminho):
+			var r := load(caminho) as RelicData
+			if r != null:
+				reliquias.append(r)
+
+
+## Reconstrói o mapa com os tipos certos (o JSON converte int em float e perde
+## a tipagem dos Arrays). Cada nó volta a ter id/coluna/ligacoes como int.
+func _desserializar_mapa(bruto) -> Array:
+	var novo_mapa: Array = []
+	for andar in bruto:
+		var novo_andar: Array = []
+		for no in andar:
+			if not (no is Dictionary):
+				continue
+			var ligacoes: Array = []
+			for lig in no.get("ligacoes", []):
+				ligacoes.append(int(lig))
+			novo_andar.append({
+				"id": int(no.get("id", 0)),
+				"tipo": no.get("tipo", "combate"),
+				"coluna": int(no.get("coluna", 0)),
+				"ligacoes": ligacoes,
+				"inimigo": no.get("inimigo", ""),
+			})
+		novo_mapa.append(novo_andar)
+	return novo_mapa

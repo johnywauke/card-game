@@ -34,6 +34,15 @@ static func criar(carta: CardData) -> Button:
 	var etiqueta := _criar_etiqueta_tipo(carta)
 	vbox.add_child(etiqueta)
 
+	# Selo de raridade: deixa o TIER explícito ao escolher/comprar cartas
+	# (além da cor da borda). Comum < Incomum < Rara.
+	var selo := Label.new()
+	selo.text = "● %s" % carta.raridade_texto()
+	selo.add_theme_font_size_override("font_size", 12)
+	selo.add_theme_color_override("font_color", _cor_raridade(carta.raridade))
+	selo.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	vbox.add_child(selo)
+
 	# Título: custo + nome.
 	var titulo := Label.new()
 	titulo.text = "[%d] %s" % [carta.custo, carta.nome]
@@ -91,14 +100,20 @@ static func _criar_etiqueta_tipo(carta: CardData) -> Control:
 	return painel
 
 
+## Cor que representa a raridade (usada na borda e no selo de tier).
+##   Comum = cinza, Incomum = azul, Rara = dourado.
+static func _cor_raridade(raridade: int) -> Color:
+	match raridade:
+		CardData.Rarity.INCOMUM:
+			return Color(0.25, 0.50, 0.85)  # Azul.
+		CardData.Rarity.RARA:
+			return Color(0.90, 0.72, 0.20)  # Dourado.
+	return Color(0.45, 0.45, 0.45)  # Comum: cinza.
+
+
 ## Estilo do botão: fundo claro + borda colorida por raridade.
 static func _aplicar_estilo(b: Button, carta: CardData) -> void:
-	var cor_borda := Color(0.55, 0.55, 0.55)  # Comum: cinza.
-	match carta.raridade:
-		CardData.Rarity.INCOMUM:
-			cor_borda = Color(0.25, 0.50, 0.85)  # Azul.
-		CardData.Rarity.RARA:
-			cor_borda = Color(0.90, 0.72, 0.20)  # Dourado.
+	var cor_borda := _cor_raridade(carta.raridade)
 
 	var normal := StyleBoxFlat.new()
 	normal.bg_color = Color(0.93, 0.89, 0.79)

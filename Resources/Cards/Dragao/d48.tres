@@ -6,12 +6,12 @@
 script = ExtResource("1_script")
 id = &"drg_cataclismo"
 nome = "Ira do Cataclismo"
-descricao = "Causa 14 de dano a todos os inimigos."
+descricao = "Causa 18 de dano a todos os inimigos."
 tipo = 0
 raridade = 2
 alvo = 1
 custo = 3
-valor_base = 14
+valor_base = 18
 fervor_ganho = 0
 fervor_custo = 0
 efeitos = []

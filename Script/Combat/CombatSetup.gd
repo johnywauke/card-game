@@ -67,13 +67,31 @@ func _ready() -> void:
 		dados_inimigo = _sortear_inimigo()
 	if inimigo != null and dados_inimigo != null:
 		inimigo.aplicar_dados(dados_inimigo)
-		# Elite recebe um reforço extra de HP (além de já ser um inimigo forte).
-		if DeckManager.tipo_no_atual == "elite":
-			inimigo.hp_max = int(dados_inimigo.hp_max * 1.2)
-			inimigo.hp_atual = inimigo.hp_max
-			inimigo.nome_exibicao = dados_inimigo.nome + " (Elite)"
-		elif DeckManager.tipo_no_atual == "chefe":
-			inimigo.nome_exibicao = dados_inimigo.nome + " (Chefe)"
+		# A dificuldade ESCALA com o andar: inimigos mais fundos têm mais HP
+		# e ganham Força, mantendo a tensão até o fim da run.
+		var fase: int = maxi(DeckManager.andar_atual, 0)
+		match DeckManager.tipo_no_atual:
+			"elite":
+				# Elite já é forte; ganha HP extra e Força nos andares avançados.
+				inimigo.hp_max = int(dados_inimigo.hp_max * 1.2 * (1.0 + 0.06 * fase))
+				inimigo.hp_atual = inimigo.hp_max
+				inimigo.nome_exibicao = dados_inimigo.nome + " (Elite)"
+				if fase >= 3:
+					inimigo.aplicar_status(&"forca", 1)
+			"chefe":
+				# Chefe é fixo (já calibrado como muralha final).
+				inimigo.nome_exibicao = dados_inimigo.nome + " (Chefe)"
+			_:
+				# Combate normal: +10% de HP por andar e Força nos andares finais.
+				inimigo.hp_max = int(dados_inimigo.hp_max * (1.0 + 0.10 * fase))
+				inimigo.hp_atual = inimigo.hp_max
+				var forca_bonus: int = 0
+				if fase >= 3:
+					forca_bonus += 1
+				if fase >= 5:
+					forca_bonus += 1
+				if forca_bonus > 0:
+					inimigo.aplicar_status(&"forca", forca_bonus)
 
 		# Troca o sprite na cena pelo do inimigo sorteado (se tiver).
 		if inimigo_sprite != null and dados_inimigo.sprite != null:

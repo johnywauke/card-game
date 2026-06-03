@@ -6,12 +6,12 @@
 script = ExtResource("1_script")
 id = &"drg_voo"
 nome = "Voo Rasante"
-descricao = "Causa 6 de dano e ganha 6 de bloqueio."
+descricao = "Causa 5 de dano e ganha 5 de bloqueio."
 tipo = 0
 raridade = 1
 alvo = 0
 custo = 1
-valor_base = 6
+valor_base = 5
 fervor_ganho = 0
 fervor_custo = 0
-efeitos = [{ "tipo": "bloqueio", "valor": 6 }]
+efeitos = [{ "tipo": "bloqueio", "valor": 5 }]

@@ -24,6 +24,10 @@ const MARGEM_TOPO := 80
 func _ready() -> void:
 	_desenhar_mapa()
 	_construir_barra_topo()
+	# Checkpoint: o mapa é o ponto estável entre atividades (combate, loja,
+	# fogueira, evento). Salvar aqui garante que fechar o jogo e voltar
+	# retoma exatamente de onde o jogador parou.
+	DeckManager.salvar_run()
 
 
 func _desenhar_mapa() -> void:

@@ -77,3 +77,64 @@ func raridade_texto() -> String:
 ## para que upgrades em uma instância não afetem as outras).
 func duplicar() -> CardData:
 	return duplicate(true) as CardData
+
+
+## --- Serialização (save/load da run) ---
+## As cartas do baralho podem estar MELHORADAS (nome com "+", valor_base maior),
+## então não basta guardar o caminho do .tres: salvamos os campos atuais.
+
+## Converte esta carta em um Dicionário simples (compatível com JSON).
+func to_dict() -> Dictionary:
+	return {
+		"id": String(id),
+		"nome": nome,
+		"descricao": descricao,
+		"tipo": int(tipo),
+		"raridade": int(raridade),
+		"alvo": int(alvo),
+		"custo": custo,
+		"valor_base": valor_base,
+		"fervor_ganho": fervor_ganho,
+		"fervor_custo": fervor_custo,
+		"efeitos": efeitos.duplicate(true),
+		"arte": arte.resource_path if arte != null else "",
+	}
+
+
+## Reconstrói uma CardData a partir de um Dicionário (vindo do save).
+## Faz casts explícitos porque o JSON transforma todo número em float.
+static func from_dict(d: Dictionary) -> CardData:
+	var c := CardData.new()
+	c.id = StringName(d.get("id", ""))
+	c.nome = d.get("nome", "Carta")
+	c.descricao = d.get("descricao", "")
+	c.tipo = int(d.get("tipo", 0))
+	c.raridade = int(d.get("raridade", 0))
+	c.alvo = int(d.get("alvo", 0))
+	c.custo = int(d.get("custo", 1))
+	c.valor_base = int(d.get("valor_base", 0))
+	c.fervor_ganho = int(d.get("fervor_ganho", 0))
+	c.fervor_custo = int(d.get("fervor_custo", 0))
+	c.efeitos = _sanitizar_efeitos(d.get("efeitos", []))
+	var caminho_arte: String = d.get("arte", "")
+	if caminho_arte != "" and ResourceLoader.exists(caminho_arte):
+		c.arte = load(caminho_arte)
+	return c
+
+
+## Garante a tipagem certa dos efeitos: converte floats inteiros (ex: 2.0)
+## de volta para int, já que o JSON não distingue int de float.
+static func _sanitizar_efeitos(lista) -> Array[Dictionary]:
+	var resultado: Array[Dictionary] = []
+	for ef in lista:
+		if typeof(ef) != TYPE_DICTIONARY:
+			continue
+		var limpo: Dictionary = {}
+		for chave in ef:
+			var v = ef[chave]
+			if typeof(v) == TYPE_FLOAT and v == floor(v):
+				limpo[chave] = int(v)
+			else:
+				limpo[chave] = v
+		resultado.append(limpo)
+	return resultado
