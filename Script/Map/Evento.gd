@@ -14,9 +14,9 @@ const EVENTOS := [
 		"texto": "Uma fonte de água cristalina borbulha à sua frente, irradiando uma luz suave.",
 		"opcoes": [
 			{ "label": "Beber da fonte", "efeitos": [{ "tipo": "curar", "valor": 15 }],
-			  "resultado": "A água restaura suas forças. +15 de HP." },
+					"resultado": "A água restaura suas forças. +15 de HP." },
 			{ "label": "Seguir viagem", "efeitos": [],
-			  "resultado": "Você decide não arriscar e segue em frente." },
+					"resultado": "Você decide não arriscar e segue em frente." },
 		],
 	},
 	{
@@ -24,9 +24,9 @@ const EVENTOS := [
 		"texto": "Um mercador encapuzado oferece uma carta rara em troca de algumas moedas.",
 		"opcoes": [
 			{ "label": "Comprar carta (50 ouro)", "custo_ouro": 50, "efeitos": [{ "tipo": "carta", "valor": 1 }],
-			  "resultado": "Você adquire uma nova carta para o baralho!" },
+					"resultado": "Você adquire uma nova carta para o baralho!" },
 			{ "label": "Recusar", "efeitos": [],
-			  "resultado": "O mercador encolhe os ombros e desaparece na névoa." },
+					"resultado": "O mercador encolhe os ombros e desaparece na névoa." },
 		],
 	},
 	{
@@ -34,9 +34,9 @@ const EVENTOS := [
 		"texto": "Um altar sombrio exige um tributo de sangue em troca de riquezas.",
 		"opcoes": [
 			{ "label": "Oferecer sangue (-8 HP, +40 ouro)", "efeitos": [{ "tipo": "dano", "valor": 8 }, { "tipo": "ouro", "valor": 40 }],
-			  "resultado": "Você sangra sobre o altar e moedas surgem. -8 HP, +40 ouro." },
+					"resultado": "Você sangra sobre o altar e moedas surgem. -8 HP, +40 ouro." },
 			{ "label": "Afastar-se", "efeitos": [],
-			  "resultado": "Você recua, perturbado, e segue caminho." },
+					"resultado": "Você recua, perturbado, e segue caminho." },
 		],
 	},
 	{
@@ -44,9 +44,9 @@ const EVENTOS := [
 		"texto": "Você encontra um pequeno tesouro abandonado entre os escombros.",
 		"opcoes": [
 			{ "label": "Pegar o ouro", "efeitos": [{ "tipo": "ouro", "valor": 30 }],
-			  "resultado": "Você embolsa as moedas. +30 de ouro!" },
+					"resultado": "Você embolsa as moedas. +30 de ouro!" },
 			{ "label": "Vasculhar mais (-6 HP, +60 ouro)", "efeitos": [{ "tipo": "dano", "valor": 6 }, { "tipo": "ouro", "valor": 60 }],
-			  "resultado": "Você se arranha remexendo, mas acha mais riquezas. -6 HP, +60 ouro." },
+					"resultado": "Você se arranha remexendo, mas acha mais riquezas. -6 HP, +60 ouro." },
 		],
 	},
 ]

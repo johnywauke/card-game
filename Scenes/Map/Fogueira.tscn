@@ -1,9 +1,9 @@
 [gd_scene format=3 uid="uid://bs1ysgt1gs5aa"]
 
-[ext_resource type="Script" path="res://Script/Map/Fogueira.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://bnjqh8n0lnw8t" path="res://Script/Map/Fogueira.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://ccxe6ppn6s6u3" path="res://Assets/Map/slay2.webp" id="2_bg"]
 
-[node name="Fogueira" type="Control"]
+[node name="Fogueira" type="Control" unique_id=1831356764]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -12,7 +12,8 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_script")
 
-[node name="Fundo" type="TextureRect" parent="."]
+[node name="Fundo" type="TextureRect" parent="." unique_id=1472920244]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -23,7 +24,7 @@ texture = ExtResource("2_bg")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="Escurecedor" type="ColorRect" parent="."]
+[node name="Escurecedor" type="ColorRect" parent="." unique_id=1387074725]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -32,7 +33,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 0.6)
 
-[node name="Centro" type="CenterContainer" parent="."]
+[node name="Centro" type="CenterContainer" parent="." unique_id=2106862634]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -40,29 +41,29 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBox" type="VBoxContainer" parent="Centro"]
+[node name="VBox" type="VBoxContainer" parent="Centro" unique_id=1223507503]
 layout_mode = 2
 theme_override_constants/separation = 24
 
-[node name="Titulo" type="Label" parent="Centro/VBox"]
+[node name="Titulo" type="Label" parent="Centro/VBox" unique_id=220163293]
 layout_mode = 2
 theme_override_font_sizes/font_size = 44
 text = "🔥 Fogueira"
 horizontal_alignment = 1
 
-[node name="Info" type="Label" parent="Centro/VBox"]
+[node name="Info" type="Label" parent="Centro/VBox" unique_id=2061338324]
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "HP: 70 / 70"
 horizontal_alignment = 1
 
-[node name="BotaoCurar" type="Button" parent="Centro/VBox"]
+[node name="BotaoCurar" type="Button" parent="Centro/VBox" unique_id=1616420210]
 custom_minimum_size = Vector2(320, 60)
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "Descansar (cura 30%)"
 
-[node name="BotaoSeguir" type="Button" parent="Centro/VBox"]
+[node name="BotaoSeguir" type="Button" parent="Centro/VBox" unique_id=1213500814]
 custom_minimum_size = Vector2(320, 60)
 layout_mode = 2
 theme_override_font_sizes/font_size = 24

@@ -1,9 +1,9 @@
-[gd_scene load_steps=3 format=3 uid="uid://loja000000001"]
+[gd_scene format=3 uid="uid://dxpjtv6ivmaii"]
 
-[ext_resource type="Script" path="res://Script/Map/Loja.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://bxvchr0j5et8h" path="res://Script/Map/Loja.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://ccxe6ppn6s6u3" path="res://Assets/Map/slay2.webp" id="2_bg"]
 
-[node name="Loja" type="Control"]
+[node name="Loja" type="Control" unique_id=1305471681]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -12,7 +12,8 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_script")
 
-[node name="Fundo" type="TextureRect" parent="."]
+[node name="Fundo" type="TextureRect" parent="." unique_id=1973962830]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -23,7 +24,7 @@ texture = ExtResource("2_bg")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="Escurecedor" type="ColorRect" parent="."]
+[node name="Escurecedor" type="ColorRect" parent="." unique_id=511632266]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -32,7 +33,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 0.6)
 
-[node name="Centro" type="CenterContainer" parent="."]
+[node name="Centro" type="CenterContainer" parent="." unique_id=1473324195]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -40,28 +41,28 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBox" type="VBoxContainer" parent="Centro"]
+[node name="VBox" type="VBoxContainer" parent="Centro" unique_id=1592734834]
 layout_mode = 2
 theme_override_constants/separation = 24
 
-[node name="Titulo" type="Label" parent="Centro/VBox"]
+[node name="Titulo" type="Label" parent="Centro/VBox" unique_id=332042332]
 layout_mode = 2
 theme_override_font_sizes/font_size = 44
 text = "🏪 Loja de Relíquias"
 horizontal_alignment = 1
 
-[node name="Ouro" type="Label" parent="Centro/VBox"]
+[node name="Ouro" type="Label" parent="Centro/VBox" unique_id=1438220146]
 layout_mode = 2
 theme_override_font_sizes/font_size = 26
 text = "💰 Ouro: 0"
 horizontal_alignment = 1
 
-[node name="Caixa" type="HBoxContainer" parent="Centro/VBox"]
+[node name="Caixa" type="HBoxContainer" parent="Centro/VBox" unique_id=1982424959]
 layout_mode = 2
 theme_override_constants/separation = 20
 alignment = 1
 
-[node name="BotaoSair" type="Button" parent="Centro/VBox"]
+[node name="BotaoSair" type="Button" parent="Centro/VBox" unique_id=568776891]
 custom_minimum_size = Vector2(280, 56)
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
