@@ -8,6 +8,7 @@
 [ext_resource type="Script" uid="uid://s6xtnt1t4qy3" path="res://Script/Combat/CombatStateMachine.gd" id="6_eqy2r"]
 [ext_resource type="Script" uid="uid://bvlaa8f8fe147" path="res://Script/Combat/CombatHUD.gd" id="7_6xvnc"]
 [ext_resource type="Script" uid="uid://ctjg1pmn7r0k4" path="res://Script/Combat/CombatSetup.gd" id="8_ui33x"]
+[ext_resource type="PackedScene" uid="uid://b0handvis0001" path="res://Scenes/Combat/Hand.tscn" id="9_mao"]
 
 [node name="Combat" type="Node2D" unique_id=1945016565]
 
@@ -164,3 +165,5 @@ text = "Terminar Turno"
 
 [node name="CombatSetup" type="Node" parent="." unique_id=1050619244]
 script = ExtResource("8_ui33x")
+
+[node name="Mao" parent="." instance=ExtResource("9_mao")]

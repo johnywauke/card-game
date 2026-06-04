@@ -1,0 +1,96 @@
+[gd_scene load_steps=2 format=3 uid="uid://b0handvis0001"]
+
+[ext_resource type="Script" path="res://Script/Combat/Hand.gd" id="1_hand"]
+
+[node name="Hand" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1_hand")
+
+[node name="Cartas" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Slot0" type="Control" parent="Cartas"]
+layout_mode = 1
+offset_left = 30.0
+offset_top = 380.0
+offset_right = 210.0
+offset_bottom = 628.0
+mouse_filter = 2
+
+[node name="Slot1" type="Control" parent="Cartas"]
+layout_mode = 1
+offset_left = 130.0
+offset_top = 380.0
+offset_right = 310.0
+offset_bottom = 628.0
+mouse_filter = 2
+
+[node name="Slot2" type="Control" parent="Cartas"]
+layout_mode = 1
+offset_left = 230.0
+offset_top = 380.0
+offset_right = 410.0
+offset_bottom = 628.0
+mouse_filter = 2
+
+[node name="Slot3" type="Control" parent="Cartas"]
+layout_mode = 1
+offset_left = 330.0
+offset_top = 380.0
+offset_right = 510.0
+offset_bottom = 628.0
+mouse_filter = 2
+
+[node name="Slot4" type="Control" parent="Cartas"]
+layout_mode = 1
+offset_left = 430.0
+offset_top = 380.0
+offset_right = 610.0
+offset_bottom = 628.0
+mouse_filter = 2
+
+[node name="Slot5" type="Control" parent="Cartas"]
+layout_mode = 1
+offset_left = 530.0
+offset_top = 380.0
+offset_right = 710.0
+offset_bottom = 628.0
+mouse_filter = 2
+
+[node name="Slot6" type="Control" parent="Cartas"]
+layout_mode = 1
+offset_left = 630.0
+offset_top = 380.0
+offset_right = 810.0
+offset_bottom = 628.0
+mouse_filter = 2
+
+[node name="Slot7" type="Control" parent="Cartas"]
+layout_mode = 1
+offset_left = 730.0
+offset_top = 380.0
+offset_right = 910.0
+offset_bottom = 628.0
+mouse_filter = 2
+
+[node name="Slot8" type="Control" parent="Cartas"]
+layout_mode = 1
+offset_left = 830.0
+offset_top = 380.0
+offset_right = 1010.0
+offset_bottom = 628.0
+mouse_filter = 2
+
+[node name="Slot9" type="Control" parent="Cartas"]
+layout_mode = 1
+offset_left = 930.0
+offset_top = 380.0
+offset_right = 1110.0
+offset_bottom = 628.0
+mouse_filter = 2

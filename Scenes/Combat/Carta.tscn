@@ -1,0 +1,131 @@
+[gd_scene load_steps=7 format=3 uid="uid://b0cartavis0001"]
+
+[ext_resource type="Script" path="res://Script/Combat/Carta.gd" id="1_carta"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_normal"]
+resource_local_to_scene = true
+bg_color = Color(0.93, 0.89, 0.79, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.45, 0.45, 0.45, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hover"]
+resource_local_to_scene = true
+bg_color = Color(1, 0.97, 0.86, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.45, 0.45, 0.45, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pressed"]
+resource_local_to_scene = true
+bg_color = Color(0.8, 0.74, 0.62, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.45, 0.45, 0.45, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_disabled"]
+bg_color = Color(0.42, 0.42, 0.42, 0.75)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.3, 0.3, 0.3, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_etiqueta"]
+resource_local_to_scene = true
+bg_color = Color(0.5, 0.5, 0.5, 1)
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="Carta" type="Button"]
+custom_minimum_size = Vector2(180, 248)
+offset_right = 180.0
+offset_bottom = 248.0
+clip_contents = true
+theme_override_styles/normal = SubResource("StyleBoxFlat_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_pressed")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_disabled")
+script = ExtResource("1_carta")
+
+[node name="Margem" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="Conteudo" type="VBoxContainer" parent="Margem"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="Etiqueta" type="PanelContainer" parent="Margem/Conteudo"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_etiqueta")
+
+[node name="EtiquetaLabel" type="Label" parent="Margem/Conteudo/Etiqueta"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 13
+text = "⚔ Ataque"
+horizontal_alignment = 1
+
+[node name="Selo" type="Label" parent="Margem/Conteudo"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.45, 0.45, 0.45, 1)
+theme_override_font_sizes/font_size = 12
+text = "● Comum"
+
+[node name="Titulo" type="Label" parent="Margem/Conteudo"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.12, 0.09, 0.05, 1)
+theme_override_font_sizes/font_size = 17
+text = "[1] Nome da Carta"
+autowrap_mode = 3
+
+[node name="Descricao" type="Label" parent="Margem/Conteudo"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.18, 0.14, 0.1, 1)
+theme_override_font_sizes/font_size = 13
+text = "Descrição da carta."
+autowrap_mode = 3

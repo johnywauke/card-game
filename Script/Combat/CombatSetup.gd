@@ -23,7 +23,7 @@ const INIMIGOS_ELITE := [
 ]
 const INIMIGO_CHEFE := "res://Resources/Enemies/guardiao_bronze.tres"
 
-const HAND_SCRIPT := "res://Script/Combat/Hand.gd"
+const CENA_MAO := "res://Scenes/Combat/Hand.tscn"
 const FIM_SCRIPT := "res://Script/Combat/CombatEndScreen.gd"
 
 @onready var jogador: Combatant = $"../Jogador"
@@ -116,11 +116,15 @@ func _ready() -> void:
 	maquina.iniciar_combate(jogador, lista_inimigos)
 
 
-## Instancia a mão (Hand.gd, um CanvasLayer) e a configura.
+## Configura a mão. A mão agora é o nó "Mao" (instância de Hand.tscn) já
+## presente na cena Combat.tscn — assim sua posição é editável no editor.
+## (Fallback: se o nó não existir, instancia a cena por código.)
 func _criar_mao() -> void:
-	var mao = load(HAND_SCRIPT).new()
-	mao.name = "Mao"
-	add_child(mao)            # CanvasLayer renderiza por cima de tudo.
+	var mao: CanvasLayer = get_node_or_null("../Mao")
+	if mao == null:
+		mao = load(CENA_MAO).instantiate()
+		mao.name = "Mao"
+		get_parent().add_child(mao)
 	mao.configurar(maquina, inimigo)
 
 
